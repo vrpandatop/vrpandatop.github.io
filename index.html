@@ -16,7 +16,7 @@
       --bg-player: #121212;
       --bg-right-panel: #121212;
       --bg-card: rgba(24, 24, 27, 0.7);
-      --bg-card-hover: rgba(39, 39, 42, 0.9);
+      --bg-card-hover: rgba(39, 39, 42, 0.95);
       --text-main: #ffffff;
       --text-sub: #a1a1aa;
       --sidebar-width: 240px;
@@ -40,9 +40,7 @@
       width: 100vw;
     }
 
-    /* =========================================================
-       1. ЛЕВОЕ МЕНЮ (SIDEBAR)
-       ========================================================= */
+    /* 1. БОКОВОЕ МЕНЮ (СЛЕВА) */
     #sidebar {
       position: fixed;
       top: 0;
@@ -54,7 +52,7 @@
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
       z-index: 100;
     }
 
@@ -104,18 +102,22 @@
     .upload-card i { font-size: 1.3rem; color: var(--primary); margin-bottom: 6px; }
     .upload-card p { font-size: 0.78rem; color: var(--text-sub); }
 
-    /* =========================================================
-       2. ЦЕНТРАЛЬНАЯ ЧАСТЬ (ГЛАВНАЯ / ПОИСК)
-       ========================================================= */
+    /* 2. ЦЕНТРАЛЬНАЯ ОБЛАСТЬ (КОНТЕНТ) */
     #main-content {
       position: fixed;
       top: 0;
       left: var(--sidebar-width);
-      right: var(--right-panel-width);
+      right: 0; /* Изначально на всю ширину до правого края */
       bottom: var(--player-height);
       overflow-y: auto;
-      padding: 24px 28px;
+      padding: 24px 30px;
       background: radial-gradient(circle at 40% 20%, #171728 0%, #09090d 100%);
+      transition: right 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Когда карточка трека открыта, освобождаем 360px справа */
+    #main-content.with-panel {
+      right: var(--right-panel-width);
     }
 
     #visualizer-canvas {
@@ -208,7 +210,7 @@
 
     .tracks-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 16px;
       margin-bottom: 34px;
     }
@@ -243,8 +245,8 @@
       position: absolute;
       bottom: 8px;
       right: 8px;
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: var(--primary);
       color: #000;
@@ -259,14 +261,14 @@
     .track-card:hover .card-play-hover { opacity: 1; transform: translateY(0); }
     .track-card .title {
       font-weight: 600;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .track-card .artist {
       color: var(--text-sub);
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       margin-top: 4px;
     }
 
@@ -313,7 +315,7 @@
     .btn-search:hover { transform: scale(1.04); background: var(--primary-hover); }
 
     /* =========================================================
-       3. ПРАВАЯ ПАНЕЛЬ: КАРТОЧКА ТОЧЬ-В-ТОЧЬ ПО СКРИНШОТУ
+       3. ПРАВАЯ ПАНЕЛЬ: ПОЯВЛЯЕТСЯ ТОЛЬКО ПРИ ВКЛЮЧЕНИИ ТРЕКА
        ========================================================= */
     #right-now-playing {
       position: fixed;
@@ -323,15 +325,38 @@
       bottom: var(--player-height);
       background-color: var(--bg-right-panel);
       border-left: 1px solid #1a1a1e;
-      padding: 16px 18px 24px 18px;
+      padding: 18px 18px 24px 18px;
       display: flex;
       flex-direction: column;
       gap: 16px;
       z-index: 100;
       overflow-y: auto;
+      transform: translateX(100%); /* Изначально спрятана за экран */
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
     }
 
-    /* Большая квадратная обложка/видео со скругленными углами */
+    #right-now-playing.visible {
+      transform: translateX(0); /* Плавно выезжает */
+    }
+
+    .panel-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .btn-close-panel {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .btn-close-panel:hover { color: #fff; }
+
+    /* Квадратная обложка трека / видеоплеер */
     .spotify-media-frame {
       width: 100%;
       aspect-ratio: 1;
@@ -368,7 +393,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       color: #fff;
-      letter-spacing: -0.3px;
     }
     .spotify-meta-artist {
       font-size: 0.95rem;
@@ -387,17 +411,15 @@
     .spotify-btn-add:hover { color: #fff; transform: scale(1.1); }
     .spotify-btn-add.added { color: var(--primary); }
 
-    /* БЛОК: «Предпросмотр текста» (темно-зеленый оливковый фон) */
+    /* БЛОК: «Предпросмотр текста» (оливковый фон Spotify) */
     .spotify-lyrics-box {
-      background-color: #273b0c; /* Фирменный оливковый оттенок Spotify */
+      background-color: #273b0c;
       border-radius: 8px;
       padding: 16px 18px;
       cursor: pointer;
       transition: background 0.2s;
     }
-    .spotify-lyrics-box:hover {
-      background-color: #314810;
-    }
+    .spotify-lyrics-box:hover { background-color: #314810; }
     .lyrics-box-label {
       font-size: 0.8rem;
       font-weight: 700;
@@ -623,7 +645,7 @@
 </head>
 <body>
 
-  <!-- 1. БОКОВОЕ МЕНЮ (ГЛАВНОЕ МЕНЮ / ПОИСК) -->
+  <!-- 1. БОКОВАЯ ПАНЕЛЬ СЛЕВА -->
   <aside id="sidebar">
     <div class="brand">
       <i class="fa-brands fa-spotify"></i>
@@ -644,21 +666,21 @@
     <label class="upload-card" for="file-upload">
       <i class="fa-solid fa-cloud-arrow-up"></i>
       <p><strong>Загрузить MP3</strong></p>
-      <p>Без ограничений и сети</p>
+      <p>С компьютера в плеер</p>
       <input type="file" id="file-upload" accept="audio/*" style="display: none;">
     </label>
   </aside>
 
-  <!-- 2. ЦЕНТРАЛЬНАЯ ЧАСТЬ: СТРАНИЦА «ГЛАВНАЯ» -->
+  <!-- 2. ЦЕНТРАЛЬНАЯ ЧАСТЬ (ГЛАВНАЯ / ПОИСК / ПЛЕЙЛИСТ) -->
   <main id="main-content">
     <canvas id="visualizer-canvas"></canvas>
 
     <div class="view-content">
-      <!-- ВКЛАДКА ГЛАВНАЯ -->
+      <!-- ВКЛАДКА: ГЛАВНАЯ -->
       <div id="page-home">
-        <h1 class="greeting-title" id="greeting-text">Добрый вечер</h1>
+        <h1 class="greeting-title" id="greeting-text">Добрый день</h1>
 
-        <!-- Верхняя сетка быстрого запуска Spotify -->
+        <!-- Сетка быстрого доступа -->
         <div class="quick-grid" id="quick-grid"></div>
 
         <div class="section-header">
@@ -667,43 +689,52 @@
         <div class="tracks-grid" id="featured-grid"></div>
 
         <div class="section-header">
-          <h2 class="section-title">Хиты и новинки</h2>
+          <h2 class="section-title">Хиты и тренды</h2>
         </div>
         <div class="tracks-grid" id="trending-grid"></div>
       </div>
 
-      <!-- ВКЛАДКА ПОИСК YOUTUBE -->
+      <!-- ВКЛАДКА: ПОИСК YOUTUBE -->
       <div id="page-search" style="display: none;">
         <div class="search-bar-wrap">
           <div class="search-input-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="input-yt-search" placeholder="Что хочешь послушать? Введи песню или автора...">
+            <input type="text" id="input-yt-search" placeholder="Что хотите послушать? Название трека или исполнитель...">
           </div>
           <button class="btn-search" id="btn-yt-search">Искать</button>
         </div>
         <div class="section-header">
           <h2 class="section-title">Результаты поиска YouTube</h2>
         </div>
-        <div class="tracks-grid" id="search-grid"></div>
+        <div class="tracks-grid" id="search-grid">
+          <p style="color:var(--text-sub); grid-column:1/-1;">Введите поисковый запрос выше и нажмите «Искать».</p>
+        </div>
       </div>
 
-      <!-- ВКЛАДКА МОЙ ПЛЕЙЛИСТ -->
+      <!-- ВКЛАДКА: МОЙ ПЛЕЙЛИСТ -->
       <div id="page-library" style="display: none;">
         <div class="section-header">
           <h2 class="section-title">Мои локальные треки</h2>
         </div>
         <div class="tracks-grid" id="library-grid">
-          <p style="color:var(--text-sub); grid-column:1/-1;">Перетащите сюда любой MP3 или нажмите кнопку слева.</p>
+          <p style="color:var(--text-sub); grid-column:1/-1;">Вы пока не загрузили свои MP3. Воспользуйтесь кнопкой «Загрузить MP3» слева.</p>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- 3. ПРАВАЯ ПАНЕЛЬ: ТОЧНАЯ КОПИЯ СПОТИФАЙ ПО СКРИНШОТУ -->
+  <!-- 3. ПРАВАЯ КАРТОЧКА «СЕЙЧАС ИГРАЕТ» (ПОЯВЛЯЕТСЯ ПРИ КЛИКЕ НА ТРЕК) -->
   <aside id="right-now-playing">
-    <!-- Квадратная обложка трека / видеоплеер -->
+    <div class="panel-top-bar">
+      <span>Сейчас играет</span>
+      <button class="btn-close-panel" id="btn-close-panel" title="Скрыть панель">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Обложка или YouTube видеоплеер -->
     <div class="spotify-media-frame">
-      <img id="card-cover-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600" alt="Cover">
+      <img id="card-cover-img" src="" alt="Cover">
       <iframe id="card-yt-frame" 
               src="" 
               style="display: none;"
@@ -713,33 +744,33 @@
       </iframe>
     </div>
 
-    <!-- Название, автор и кнопка "+" -->
+    <!-- Метаданные трека и кнопка сохранения -->
     <div class="spotify-meta-row">
       <div class="spotify-meta-texts">
-        <div class="spotify-meta-title" id="card-track-title">Почти всегда</div>
-        <div class="spotify-meta-artist" id="card-track-artist">Kuznetsky Squad</div>
+        <div class="spotify-meta-title" id="card-track-title">Название трека</div>
+        <div class="spotify-meta-artist" id="card-track-artist">Исполнитель</div>
       </div>
       <button class="spotify-btn-add" id="btn-save-track" title="Добавить в любимые">
         <i class="fa-regular fa-circle-plus" id="icon-add-track"></i>
       </button>
     </div>
 
-    <!-- КАРТОЧКА: «Предпросмотр текста» (в темно-зеленых оливковых тонах) -->
+    <!-- «Предпросмотр текста» -->
     <div class="spotify-lyrics-box" id="lyrics-box">
       <div class="lyrics-box-label">Предпросмотр текста</div>
-      <div class="lyrics-main-line" id="lyric-main">Мы сливаем бабки чаще, чем почти всегда</div>
-      <div class="lyrics-sub-line" id="lyric-sub">Покупаем тряпки, но не...</div>
+      <div class="lyrics-main-line" id="lyric-main">Текст песни</div>
+      <div class="lyrics-sub-line" id="lyric-sub">Следующая строка...</div>
     </div>
 
-    <!-- КАРТОЧКА: «Об исполнителе» -->
+    <!-- «Об исполнителе» -->
     <div class="spotify-about-box">
-      <div class="about-artist-hero" id="about-hero" style="background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600');">
+      <div class="about-artist-hero" id="about-hero">
         <span class="about-artist-label">Об исполнителе</span>
       </div>
       <div class="about-artist-body">
-        <div class="about-artist-name" id="about-name">Kuznetsky Squad</div>
-        <div class="about-artist-listeners" id="about-listeners">324 190 слушателей за месяц</div>
-        <div class="about-artist-bio" id="about-bio">Популярный хип-хоп проект с драйвовыми битами и узнаваемым стилем.</div>
+        <div class="about-artist-name" id="about-name">Исполнитель</div>
+        <div class="about-artist-listeners" id="about-listeners">0 слушателей за месяц</div>
+        <div class="about-artist-bio" id="about-bio">Описание исполнителя...</div>
       </div>
     </div>
   </aside>
@@ -749,40 +780,34 @@
     <div class="player-left">
       <img id="bar-cover-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=150" alt="Cover">
       <div class="track-details">
-        <div class="name" id="bar-track-title">Почти всегда</div>
-        <div class="author" id="bar-track-artist">Kuznetsky Squad</div>
+        <div class="name" id="bar-track-title">Выберите трек</div>
+        <div class="author" id="bar-track-artist">SpotiBox Player</div>
       </div>
     </div>
 
     <div class="player-center">
       <div class="controls">
-        <!-- 1. SHUFFLE -->
         <button class="btn-ctrl" id="btn-shuffle" title="Перемешать (Случайный порядок)">
           <i class="fa-solid fa-shuffle"></i>
         </button>
 
-        <!-- 2. PREV -->
         <button class="btn-ctrl" id="btn-prev" title="Предыдущий трек">
           <i class="fa-solid fa-backward-step"></i>
         </button>
 
-        <!-- 3. PLAY / PAUSE -->
         <button class="play-btn" id="btn-play">
           <i class="fa-solid fa-play" id="icon-play"></i>
         </button>
 
-        <!-- 4. NEXT -->
         <button class="btn-ctrl" id="btn-next" title="Следующий трек">
           <i class="fa-solid fa-forward-step"></i>
         </button>
 
-        <!-- 5. REPEAT -->
         <button class="btn-ctrl" id="btn-repeat" title="Повтор: Выкл / Плейлист / Трек">
           <i class="fa-solid fa-repeat"></i>
         </button>
       </div>
 
-      <!-- ПОЛОСА ПЕРЕМОТКИ -->
       <div class="seek-bar-wrap">
         <span id="txt-cur-time">0:00</span>
         <div class="seek-bar-bg" id="seek-bar">
@@ -803,7 +828,7 @@
 
   <script>
     /* ==========================================================
-       1. БАЗА ТРЕКОВ (ВКЛЮЧАЯ ТРЕК СО СКРИНШОТА)
+       1. ДАННЫЕ ТРЕКОВ ДЛЯ «ГЛАВНОЙ»
        ========================================================== */
     const YOUTUBE_API_KEY = "AIzaSyAwp3kJuIcARfKIpRE1NSVcH1SBIzUhDck";
 
@@ -818,7 +843,7 @@
         listeners: "324 190 слушателей за месяц",
         bio: "Молодое хип-хоп трио, сочетающее броские панчлайны и стиль столичных улиц.",
         lyricMain: "Мы сливаем бабки чаще, чем почти всегда",
-        lyricSub: "Покупаем тряпки, но не..."
+        lyricSub: "Покупаем тряпки, но не смотрим на цены..."
       },
       {
         title: "MF DOOM - One Beer",
@@ -876,14 +901,14 @@
         cover: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600",
         hero: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600",
         listeners: "2 140 000 слушателей за месяц",
-        bio: "Ночной фонк и электронный драйв для поездок.",
+        bio: "Ночной фонк и электронный драйв для ночных поездок.",
         lyricMain: "Полночный город в зеркале заднего вида",
         lyricSub: "Скорость уносит все сомнения..."
       }
     ];
 
     let currentPlaylist = [...curatedTracks];
-    let currentIdx = 0;
+    let currentIdx = -1;
     let isPlaying = false;
     let isShuffle = false;
     let repeatState = 0;
@@ -891,6 +916,10 @@
     const audio = document.getElementById('native-audio');
 
     // Элементы правой карточки
+    const rightPanel = document.getElementById('right-now-playing');
+    const mainContent = document.getElementById('main-content');
+    const btnClosePanel = document.getElementById('btn-close-panel');
+
     const cardYtFrame = document.getElementById('card-yt-frame');
     const cardCoverImg = document.getElementById('card-cover-img');
     const cardTrackTitle = document.getElementById('card-track-title');
@@ -930,8 +959,8 @@
     else greetingText.textContent = "Добрый вечер";
 
     /* ==========================================================
-       2. ВОСПРОИЗВЕДЕНИЕ И ОБНОВЛЕНИЕ КАРТОЧКИ
-       ========================================================== */
+       2. ВОСПРОИЗВЕДЕНИЕ И ПОЯВЛЕНИЕ КАРТОЧКИ ТРЕКА
+       ========================================================= */
     function playTrack(idx, list = currentPlaylist) {
       if (idx < 0 || idx >= list.length) return;
       currentPlaylist = list;
@@ -939,20 +968,24 @@
       const track = currentPlaylist[idx];
       initAudio();
 
-      // Обновление правой карточки точно как в скриншоте
+      // 1. Показываем правую карточку и подстраиваем ширину контента
+      rightPanel.classList.add('visible');
+      mainContent.classList.add('with-panel');
+
+      // 2. Заполняем карточку ИМЕННО данными этого трека
       cardTrackTitle.textContent = decodeHtml(track.title);
       cardTrackArtist.textContent = decodeHtml(track.artist);
       cardCoverImg.src = track.cover;
 
-      lyricMain.textContent = track.lyricMain || "Текст песни загружается...";
-      lyricSub.textContent = track.lyricSub || "Слушайте музыку на SpotiBox...";
+      lyricMain.textContent = track.lyricMain || `Воспроизведение: ${decodeHtml(track.title)}`;
+      lyricSub.textContent = track.lyricSub || `Исполнитель: ${decodeHtml(track.artist)}`;
 
       aboutHero.style.backgroundImage = `url('${track.hero || track.cover}')`;
       aboutName.textContent = decodeHtml(track.artist);
-      aboutListeners.textContent = track.listeners || "324 190 слушателей за месяц";
-      aboutBio.textContent = track.bio || `Популярный исполнитель ${decodeHtml(track.artist)} на платформе SpotiBox.`;
+      aboutListeners.textContent = track.listeners || "YouTube Music Stream";
+      aboutBio.textContent = track.bio || `Популярный трек от ${decodeHtml(track.artist)} на SpotiBox.`;
 
-      // Обновление нижней панели
+      // 3. Обновляем нижнюю панель плеера
       barTrackTitle.textContent = decodeHtml(track.title);
       barTrackArtist.textContent = decodeHtml(track.artist);
       barCoverImg.src = track.cover;
@@ -975,21 +1008,27 @@
         audio.play().then(() => {
           isPlaying = true;
           iconPlay.className = 'fa-solid fa-pause';
-        });
+        }).catch(e => console.warn(e));
       }
     }
+
+    // Закрытие карточки по крестику
+    btnClosePanel.onclick = () => {
+      rightPanel.classList.remove('visible');
+      mainContent.classList.remove('with-panel');
+    };
 
     btnPlay.onclick = () => {
       initAudio();
       if (!isPlaying) {
-        if (currentPlaylist.length > 0) {
-          if (currentPlaylist[currentIdx]?.type === 'youtube') {
-            playTrack(currentIdx);
-          } else {
-            audio.play();
-            isPlaying = true;
-            iconPlay.className = 'fa-solid fa-pause';
-          }
+        if (currentIdx === -1) {
+          playTrack(0, curatedTracks);
+        } else if (currentPlaylist[currentIdx]?.type === 'youtube') {
+          playTrack(currentIdx);
+        } else {
+          audio.play();
+          isPlaying = true;
+          iconPlay.className = 'fa-solid fa-pause';
         }
       } else {
         if (currentPlaylist[currentIdx]?.type === 'youtube') {
@@ -1002,7 +1041,6 @@
       }
     };
 
-    /* Кнопка "+" (в любимые треки) */
     btnSaveTrack.onclick = () => {
       btnSaveTrack.classList.toggle('added');
       if (btnSaveTrack.classList.contains('added')) {
@@ -1054,7 +1092,7 @@
     };
 
     /* ==========================================================
-       4. ЛОГИКА КНОПОК SHUFFLE И REPEAT
+       4. SHUFFLE & REPEAT
        ========================================================= */
     btnShuffle.onclick = () => {
       isShuffle = !isShuffle;
@@ -1109,8 +1147,29 @@
     };
 
     /* ==========================================================
-       5. СТРАНИЦА «ГЛАВНАЯ» И ПОИСК
+       5. НАВИГАЦИЯ (ГЛАВНАЯ, ПОИСК YOUTUBE, МОЙ ПЛЕЙЛИСТ)
        ========================================================= */
+    const navHome = document.getElementById('nav-home');
+    const navSearch = document.getElementById('nav-search');
+    const navLibrary = document.getElementById('nav-library');
+
+    const pageHome = document.getElementById('page-home');
+    const pageSearch = document.getElementById('page-search');
+    const pageLibrary = document.getElementById('page-library');
+
+    function switchPage(activeNav, activePage) {
+      [navHome, navSearch, navLibrary].forEach(n => n.classList.remove('active'));
+      [pageHome, pageSearch, pageLibrary].forEach(p => p.style.display = 'none');
+
+      activeNav.classList.add('active');
+      activePage.style.display = 'block';
+    }
+
+    navHome.onclick = () => switchPage(navHome, pageHome);
+    navSearch.onclick = () => switchPage(navSearch, pageSearch);
+    navLibrary.onclick = () => switchPage(navLibrary, pageLibrary);
+
+    /* Рендер карточек на Главной */
     function renderQuickGrid() {
       const container = document.getElementById('quick-grid');
       container.innerHTML = '';
@@ -1150,12 +1209,6 @@
     renderCardsTo('featured-grid', curatedTracks.slice(0, 4));
     renderCardsTo('trending-grid', curatedTracks.slice(2, 6));
 
-    // Загрузка первого трека по умолчанию
-    playTrack(0, curatedTracks);
-    audio.pause();
-    isPlaying = false;
-    iconPlay.className = 'fa-solid fa-play';
-
     /* Поиск YouTube API */
     const inputSearch = document.getElementById('input-yt-search');
     const btnSearch = document.getElementById('btn-yt-search');
@@ -1163,7 +1216,7 @@
     async function searchYouTube(query) {
       if (!query.trim()) return;
       const container = document.getElementById('search-grid');
-      container.innerHTML = `<p style="grid-column: 1/-1; color: var(--text-sub);">Ищем на YouTube...</p>`;
+      container.innerHTML = `<p style="grid-column: 1/-1; color: var(--text-sub);">Ищем на YouTube: "${query}"...</p>`;
 
       try {
         const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`;
@@ -1184,13 +1237,13 @@
           hero: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.medium.url,
           listeners: "YouTube Music",
           bio: `Официальное видео от канала ${decodeHtml(item.snippet.channelTitle)} на YouTube.`,
-          lyricMain: `Воспроизведение видео: ${decodeHtml(item.snippet.title)}`,
-          lyricSub: "Включен неоновый визуализатор звука..."
+          lyricMain: `Воспроизведение: ${decodeHtml(item.snippet.title)}`,
+          lyricSub: "Слушайте на SpotiBox с неоновым визуализатором..."
         }));
 
         renderCardsTo('search-grid', results);
       } catch (err) {
-        container.innerHTML = `<p style="grid-column: 1/-1; color: #f87171;">Ошибка сети</p>`;
+        container.innerHTML = `<p style="grid-column: 1/-1; color: #f87171;">Ошибка сети при подключении к YouTube</p>`;
       }
     }
 
@@ -1203,28 +1256,7 @@
       return txt.value;
     }
 
-    /* Навигация по вкладкам Меню */
-    const navHome = document.getElementById('nav-home');
-    const navSearch = document.getElementById('nav-search');
-    const navLibrary = document.getElementById('nav-library');
-
-    const pageHome = document.getElementById('page-home');
-    const pageSearch = document.getElementById('page-search');
-    const pageLibrary = document.getElementById('page-library');
-
-    function switchPage(activeNav, activePage) {
-      [navHome, navSearch, navLibrary].forEach(n => n.classList.remove('active'));
-      [pageHome, pageSearch, pageLibrary].forEach(p => p.style.display = 'none');
-
-      activeNav.classList.add('active');
-      activePage.style.display = 'block';
-    }
-
-    navHome.onclick = () => switchPage(navHome, pageHome);
-    navSearch.onclick = () => switchPage(navSearch, pageSearch);
-    navLibrary.onclick = () => switchPage(navLibrary, pageLibrary);
-
-    /* Загрузка локальных треков */
+    /* Загрузка локальных MP3 */
     const myLocalTracks = [];
     document.getElementById('file-upload').onchange = (e) => {
       const file = e.target.files[0];
@@ -1237,9 +1269,9 @@
           cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600",
           hero: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600",
           listeners: "Локальное аудио",
-          bio: "Воспроизведение без сжатия напрямую из файловой системы.",
+          bio: "Воспроизведение без сжатия напрямую из вашего компьютера.",
           lyricMain: file.name,
-          lyricSub: "Файл загружен с вашего компьютера"
+          lyricSub: "Аудиофайл загружен в плеер"
         };
         myLocalTracks.unshift(track);
         renderCardsTo('library-grid', myLocalTracks);
@@ -1250,7 +1282,7 @@
 
     /* ==========================================================
        6. НЕОНОВЫЙ ВИЗУАЛИЗАТОР XBOX 360
-       ========================================================== */
+       ========================================================= */
     let audioCtx = null;
     let analyser = null;
     const freqBins = new Uint8Array(256);
@@ -1293,13 +1325,13 @@
     function drawVisualizer() {
       requestAnimationFrame(drawVisualizer);
 
-      // Xbox 360 свечение со шлейфом
+      // Xbox 360 Trails
       ctx.fillStyle = 'rgba(9, 9, 13, 0.22)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       let bass = 0.05;
 
-      if (currentPlaylist[currentIdx]?.type === 'local' && isPlaying && analyser) {
+      if (currentIdx !== -1 && currentPlaylist[currentIdx]?.type === 'local' && isPlaying && analyser) {
         analyser.getByteFrequencyData(freqBins);
         analyser.getByteTimeDomainData(timeBins);
         let sum = 0;
