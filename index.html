@@ -48,13 +48,13 @@
         }
         /* Hide YouTube iframe visually but keep active for audio playback */
         #youtube-player-container {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
+            position: fixed;
+            bottom: -9999px;
+            right: -9999px;
+            width: 200px;
+            height: 200px;
             pointer-events: none;
+            opacity: 0.01;
         }
         /* Visualizer full-screen overlay animations */
         .neon-glow {
@@ -500,7 +500,7 @@
         </div>
     </div>
 
-    <!-- Hidden YouTube iframe container -->
+    <!-- YouTube iframe container -->
     <div id="youtube-player-container">
         <div id="yt-player"></div>
     </div>
@@ -526,19 +526,9 @@
         let progressInterval = null;
 
         // Visualizer State
-        let audioCtx, analyser, dataArray;
-        let vizPreset = 'liquid-waves'; // Set fixed liquid wave visualization by default
+        let audioCtx, dataArray;
+        let vizPreset = 'liquid-waves';
         let vizAnimationFrame = null;
-
-        // Realistic Fallback/Mock Songs for fallback when API reaches quota limits
-        const mockTracks = [
-            { id: "jfKfPfyJRdk", title: "XS - ONDA ANDAR (Liquid Version)", channel: "ONDA ANDAR", duration: "3:45", thumbnail: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400" },
-            { id: "5qap5aO4i9A", title: "Lofi Hip Hop - Chill Beats", channel: "ChillHop", duration: "4:12", thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" },
-            { id: "2spya3S584Y", title: "Phonk Mix 2024 - Drift & Bass", channel: "Phonk Nation", duration: "2:50", thumbnail: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400" },
-            { id: "MVPTGNGiI-4", title: "Synthwave Cyberpunk 80s Retrowave", channel: "Retro Vibes", duration: "5:10", thumbnail: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400" },
-            { id: "10S9A3j0Rng", title: "Gaming Music Cyberpunk Beats", channel: "NCS", duration: "3:30", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400" },
-            { id: "fJ9rUzIMcZQ", title: "Queen - Bohemian Rhapsody (Official)", channel: "Queen Official", duration: "5:55", thumbnail: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400" }
-        ];
 
         // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -547,8 +537,8 @@
             if (savedKey) YOUTUBE_API_KEY = savedKey;
             document.getElementById('api-key-input').value = YOUTUBE_API_KEY;
 
-            // Load Initial Home Content
-            renderTracksGrid(mockTracks, 'home-tracks-grid');
+            // Load Initial YouTube Recommendations
+            searchQuery('Музыка 2024 хиты', true);
             updateLikedCount();
 
             // Setup Search Inputs
@@ -561,7 +551,7 @@
                 if (ytPlayer && playerReady && ytPlayer.getDuration) {
                     const dur = ytPlayer.getDuration();
                     const newTime = (e.target.value / 100) * dur;
-                    ytPlayer.seekTo(newTime);
+                    ytPlayer.seekTo(newTime, true);
                 }
             });
 
@@ -582,8 +572,19 @@
             panel.classList.toggle('hidden');
         }
 
+        // Ensure user interaction unlocks audio context
+        function unlockAudioContext() {
+            if (!audioCtx) {
+                initWebAudio();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         // --- Playback Controls ---
         function playTrackDirect(track) {
+            unlockAudioContext();
             currentQueue = [track];
             currentIndex = 0;
             loadTrack(track);
@@ -611,12 +612,13 @@
 
             if (ytPlayer && playerReady) {
                 ytPlayer.loadVideoById(track.id);
+                ytPlayer.playVideo();
                 isPlaying = true;
                 updatePlayPauseUI();
             }
         }
 
-        // Generate dynamic mock lyrics based on track title
+        // Dynamic Liquid Lyrics
         function updateLiquidLyrics(title) {
             const container = document.getElementById('lyrics-content-container');
             container.innerHTML = `
@@ -625,7 +627,7 @@
                 <p class="lyrics-line-active text-emerald-300 font-bold my-2 text-sm transition">Серебро в руках, мне его не оторвать ща</p>
                 <p class="lyrics-line transition">Иду высоко, не хочу просыпаться</p>
                 <p class="lyrics-line transition">Вокруг много людей, мы знакомы</p>
-                <p class="lyrics-line transition">Волна ${title}</p>
+                <p class="lyrics-line transition">YouTube Волна • ${title}</p>
             `;
         }
 
@@ -642,16 +644,20 @@
         // --- YouTube API Player setup ---
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player', {
-                height: '0',
-                width: '0',
+                height: '200',
+                width: '200',
                 videoId: '',
                 playerVars: {
                     'playsinline': 1,
                     'controls': 0,
-                    'disablekb': 1
+                    'autoplay': 1,
+                    'origin': window.location.origin
                 },
                 events: {
-                    'onReady': () => { playerReady = true; },
+                    'onReady': () => { 
+                        playerReady = true;
+                        if (ytPlayer.setVolume) ytPlayer.setVolume(80);
+                    },
                     'onStateChange': onPlayerStateChange
                 }
             });
@@ -662,7 +668,6 @@
                 isPlaying = true;
                 updatePlayPauseUI();
                 startProgressTimer();
-                initWebAudio();
             } else if (event.data === YT.PlayerState.PAUSED) {
                 isPlaying = false;
                 updatePlayPauseUI();
@@ -676,15 +681,16 @@
             }
         }
 
-        // --- YouTube Data API Fetch ---
-        async function searchQuery(query) {
+        // --- STRICT YouTube Data API Search ---
+        async function searchQuery(query, isHomeInit = false) {
             if (!query.trim()) return;
-            switchTab('search');
-            document.getElementById('search-results-title').textContent = `Результаты поиска: "${query}"`;
+            if (!isHomeInit) switchTab('search');
+            
+            document.getElementById('search-results-title').textContent = `Результаты поиска на YouTube: "${query}"`;
             document.getElementById('main-search-input').value = query;
 
             try {
-                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=18&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`;
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=18&type=video&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
                 const res = await fetch(url);
                 const data = await res.json();
 
@@ -693,17 +699,26 @@
                         id: item.id.videoId,
                         title: item.snippet.title,
                         channel: item.snippet.channelTitle,
-                        duration: "3:30",
+                        duration: "YouTube",
                         thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.default.url
                     }));
-                    renderTracksGrid(tracks, 'search-tracks-grid');
+                    if (isHomeInit) {
+                        renderTracksGrid(tracks, 'home-tracks-grid');
+                    } else {
+                        renderTracksGrid(tracks, 'search-tracks-grid');
+                    }
                 } else {
-                    renderTracksGrid(mockTracks, 'search-tracks-grid');
+                    showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Ничего не найдено на YouTube.');
                 }
             } catch (err) {
-                console.warn("YouTube API error or quota reached, fallback to mock data", err);
-                renderTracksGrid(mockTracks, 'search-tracks-grid');
+                console.error("YouTube API Search Error:", err);
+                showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Ошибка подключения к YouTube API. Проверьте ваш API Ключ.');
             }
+        }
+
+        function showSearchError(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="col-span-full p-8 text-center text-zinc-400 font-medium">${message}</div>`;
         }
 
         function clearSearch() {
@@ -736,6 +751,7 @@
         }
 
         function togglePlayPause() {
+            unlockAudioContext();
             if (!ytPlayer || !playerReady) return;
             if (isPlaying) {
                 ytPlayer.pauseVideo();
@@ -872,10 +888,10 @@
             alert('Создание плейлистов: функция добавлена в вашу библиотеку.');
         }
 
-        // --- Download Simulation ---
+        // --- YouTube Download / Metadata Export ---
         function downloadCurrentTrack() {
             if (currentIndex < 0 || !currentQueue[currentIndex]) {
-                alert('Сначала выберите и запустите трек!');
+                alert('Сначала выберите и запустите трек с YouTube!');
                 return;
             }
             const track = currentQueue[currentIndex];
@@ -895,7 +911,7 @@
             dlAnchor.click();
             dlAnchor.remove();
 
-            alert(`Загрузка метаданных для "${track.title}" успешно начата!\nДля прямой загрузки MP3 используйте внешний сервис с вашим видео-ID: ${track.id}`);
+            alert(`Загрузка метаданных YouTube трека "${track.title}" начата!\nURL: ${ytUrl}`);
         }
 
         // --- Navigation ---
@@ -935,29 +951,24 @@
                 localStorage.setItem('soundtube_yt_key', key);
                 closeSettingsModal();
                 alert('YouTube API Ключ успешно сохранен!');
+                searchQuery('Музыка 2024 хиты', true);
             }
         }
 
-        // --- ENHANCED XBOX 360 VISUALIZER ENGINE (Web Audio API + HTML5 Canvas) ---
+        // --- RELIABLE XBOX 360 VISUALIZER ENGINE ---
         function initWebAudio() {
-            if (audioCtx) return;
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
             } catch (e) {
-                console.warn('Web Audio Context initialize failed:', e);
+                console.warn('Web Audio initialize failed:', e);
             }
         }
 
         function openVisualizerModal() {
+            unlockAudioContext();
             document.getElementById('visualizer-modal').classList.remove('hidden');
             resizeCanvas();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
             startVisualizerAnimation();
         }
 
@@ -989,16 +1000,13 @@
 
             function draw() {
                 vizAnimationFrame = requestAnimationFrame(draw);
-                vizTime += 0.03;
+                vizTime += isPlaying ? 0.04 : 0.01;
 
-                if (analyser && dataArray) {
-                    analyser.getByteFrequencyData(dataArray);
-                } else {
-                    // Smooth continuous audio fallback
-                    dataArray = new Uint8Array(128);
-                    for (let i = 0; i < 128; i++) {
-                        dataArray[i] = Math.floor(Math.sin(vizTime * 3 + i * 0.15) * 80 + 130);
-                    }
+                // Generates smooth dynamic spectrum array synced to playback state
+                dataArray = new Uint8Array(128);
+                const activeIntensity = isPlaying ? 1.0 : 0.2;
+                for (let i = 0; i < 128; i++) {
+                    dataArray[i] = Math.floor((Math.sin(vizTime * 4 + i * 0.12) * 80 + 120) * activeIntensity);
                 }
 
                 ctx.fillStyle = 'rgba(5, 8, 7, 0.25)';
@@ -1009,10 +1017,10 @@
                 const centerX = width / 2;
                 const centerY = height / 2;
 
-                let bass = dataArray[2] || 120;
+                let bass = dataArray[2] || 60;
 
                 if (vizPreset === 'liquid-waves') {
-                    // --- REFIXED LIQUID WAVES VISUALIZER ---
+                    // --- LIQUID WAVES VISUALIZER ---
                     ctx.save();
                     const waveLayers = 4;
                     for (let w = 0; w < waveLayers; w++) {
@@ -1064,7 +1072,7 @@
                         ctx.stroke();
                     }
 
-                    // Pulsing XBOX 360 Neon Core Spheres
+                    // Core Neon Sphere
                     ctx.beginPath();
                     const coreRadius = 45 + (bass / 255) * 50;
                     const grad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, coreRadius);
