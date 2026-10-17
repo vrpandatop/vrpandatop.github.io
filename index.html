@@ -298,8 +298,10 @@
                 <!-- Visible YouTube Embed Dock -->
                 <div class="mt-4 pt-2">
                     <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">Плеер YouTube</span>
-                    <div class="yt-player-frame border border-zinc-800 shadow-md">
-                        <div id="yt-player"></div>
+                    <div class="yt-player-frame border border-zinc-800 shadow-md relative overflow-hidden">
+                        <div id="yt-player-container" class="w-full h-full">
+                            <div id="yt-player"></div>
+                        </div>
                     </div>
                     <p class="text-[10px] text-zinc-500 mt-2 text-center" id="player-status-text">Готов к воспроизведению</p>
                 </div>
@@ -460,6 +462,7 @@
         let ytPlayer = null;
         let playerReady = false;
         let progressInterval = null;
+        let currentTrackId = null;
 
         // Visualizer State
         let vizPreset = 'liquid-waves';
@@ -482,7 +485,7 @@
 
             // Seek Bar Handler
             document.getElementById('seek-bar').addEventListener('input', (e) => {
-                if (ytPlayer && playerReady && ytPlayer.getDuration) {
+                if (ytPlayer && playerReady && typeof ytPlayer.getDuration === 'function') {
                     const dur = ytPlayer.getDuration();
                     const newTime = (e.target.value / 100) * dur;
                     ytPlayer.seekTo(newTime, true);
@@ -491,7 +494,7 @@
 
             // Volume Control Handler
             document.getElementById('volume-bar').addEventListener('input', (e) => {
-                if (ytPlayer && playerReady && ytPlayer.setVolume) {
+                if (ytPlayer && playerReady && typeof ytPlayer.setVolume === 'function') {
                     ytPlayer.setVolume(e.target.value);
                 }
             });
@@ -505,36 +508,48 @@
             panel.classList.toggle('hidden');
         }
 
-        // --- YouTube API Setup ---
+        // --- YouTube API Setup & Direct Embed Fallback ---
         function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('yt-player', {
-                height: '100%',
-                width: '100%',
-                videoId: '',
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 1,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'playsinline': 1
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
+            try {
+                const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
+                ytPlayer = new YT.Player('yt-player', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: '',
+                    playerVars: {
+                        'autoplay': 1,
+                        'controls': 1,
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'playsinline': 1,
+                        'enablejsapi': 1,
+                        'origin': origin
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange,
+                        'onError': onPlayerError
+                    }
+                });
+            } catch (err) {
+                console.warn("YouTube API init fallback to Iframe:", err);
+            }
         }
 
         function onPlayerReady(event) {
             playerReady = true;
             document.getElementById('player-status-text').textContent = "Плеер готов к воспроизведению";
-            if (ytPlayer.setVolume) ytPlayer.setVolume(80);
+            if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(80);
+            if (currentTrackId) {
+                ytPlayer.loadVideoById(currentTrackId);
+                ytPlayer.playVideo();
+            }
         }
 
         function onPlayerError(e) {
             console.error("YouTube Player Error:", e.data);
-            document.getElementById('player-status-text').textContent = "Ошибка воспроизведения этого трека";
+            document.getElementById('player-status-text').textContent = "Переключение на прямой поток YouTube...";
+            fallbackToDirectIframe(currentTrackId);
         }
 
         function onPlayerStateChange(event) {
@@ -551,11 +566,31 @@
                 if (statusEl) statusEl.textContent = "Пауза";
             } else if (event.data === YT.PlayerState.ENDED) {
                 if (isLoop) {
-                    ytPlayer.playVideo();
+                    if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
+                    else fallbackToDirectIframe(currentTrackId);
                 } else {
                     playNextTrack();
                 }
             }
+        }
+
+        // Fallback Direct Iframe Embedding for Restricted Origins
+        function fallbackToDirectIframe(videoId) {
+            if (!videoId) return;
+            const container = document.getElementById('yt-player-container');
+            const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
+            container.innerHTML = `
+                <iframe id="direct-yt-iframe" 
+                        class="w-full h-full border-0" 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(origin)}" 
+                        allow="autoplay; encrypted-media; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            `;
+            isPlaying = true;
+            updatePlayPauseUI();
+            document.getElementById('player-status-text').textContent = "Воспроизведение (Direct Engine)";
+            startProgressTimer();
         }
 
         // Title Cleanup for Spotify look
@@ -577,7 +612,6 @@
             document.getElementById('main-search-input').value = query;
 
             try {
-                // videoCategoryId=10 restricts results strictly to YouTube Music
                 const searchQueryFormatted = encodeURIComponent(query + " song audio");
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=18&type=video&videoCategoryId=10&q=${searchQueryFormatted}&key=${YOUTUBE_API_KEY}`;
                 
@@ -648,6 +682,8 @@
         }
 
         function loadTrack(track) {
+            currentTrackId = track.id;
+
             // Update UI Elements
             document.getElementById('player-thumb').src = track.thumbnail;
             document.getElementById('player-title').textContent = track.title;
@@ -664,23 +700,38 @@
 
             checkIfLiked(track.id);
 
-            // Execute YouTube Player Load
-            if (ytPlayer && playerReady) {
-                ytPlayer.loadVideoById(track.id);
-                ytPlayer.playVideo();
-                isPlaying = true;
-                updatePlayPauseUI();
+            // Execute Playback
+            if (ytPlayer && playerReady && typeof ytPlayer.loadVideoById === 'function') {
+                try {
+                    ytPlayer.loadVideoById(track.id);
+                    ytPlayer.playVideo();
+                    isPlaying = true;
+                    updatePlayPauseUI();
+                } catch (e) {
+                    fallbackToDirectIframe(track.id);
+                }
             } else {
-                setTimeout(() => loadTrack(track), 500);
+                fallbackToDirectIframe(track.id);
             }
         }
 
         function togglePlayPause() {
-            if (!ytPlayer || !playerReady) return;
-            if (isPlaying) {
-                ytPlayer.pauseVideo();
-            } else {
-                ytPlayer.playVideo();
+            if (ytPlayer && playerReady && typeof ytPlayer.pauseVideo === 'function') {
+                if (isPlaying) {
+                    ytPlayer.pauseVideo();
+                } else {
+                    ytPlayer.playVideo();
+                }
+            } else if (currentTrackId) {
+                // Toggle fallback
+                if (isPlaying) {
+                    document.getElementById('yt-player-container').innerHTML = '';
+                    isPlaying = false;
+                    updatePlayPauseUI();
+                    stopProgressTimer();
+                } else {
+                    fallbackToDirectIframe(currentTrackId);
+                }
             }
         }
 
@@ -720,7 +771,7 @@
         function startProgressTimer() {
             stopProgressTimer();
             progressInterval = setInterval(() => {
-                if (ytPlayer && playerReady && ytPlayer.getCurrentTime && ytPlayer.getDuration) {
+                if (ytPlayer && playerReady && typeof ytPlayer.getCurrentTime === 'function' && typeof ytPlayer.getDuration === 'function') {
                     const cur = ytPlayer.getCurrentTime() || 0;
                     const dur = ytPlayer.getDuration() || 1;
                     const pct = (cur / dur) * 100;
