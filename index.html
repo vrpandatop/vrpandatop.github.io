@@ -63,6 +63,19 @@
         .xbox-glow {
             box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
         }
+        /* Glass card styling for Liquid Lyrics */
+        .lyrics-card {
+            background: linear-gradient(135deg, rgba(18, 24, 27, 0.85), rgba(10, 10, 12, 0.95));
+            border: 1px solid rgba(29, 185, 84, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .lyrics-line-active {
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(29, 185, 84, 0.6);
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col bg-black text-gray-100">
@@ -145,6 +158,10 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
+                    <button onclick="toggleRightPanel()" id="toggle-panel-btn" class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold transition" title="Открыть панель «Сейчас играет»">
+                        <i class="fa-solid fa-sliders text-emerald-400"></i>
+                        <span class="hidden sm:inline">Сейчас играет</span>
+                    </button>
                     <button onclick="openVisualizerModal()" class="flex items-center space-x-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-xs font-semibold tracking-wide transition">
                         <i class="fa-solid fa-compact-disc animate-spin text-sm" style="animation-duration: 6s;"></i>
                         <span>XBOX Visualizer</span>
@@ -265,6 +282,87 @@
 
             </div>
         </main>
+
+        <!-- RIGHT SIDEBAR (NOW PLAYING & LIQUID LYRICS CARD) -->
+        <aside id="right-now-playing-panel" class="w-80 bg-zinc-950 border-l border-zinc-800/80 p-5 flex flex-col justify-between overflow-y-auto shrink-0 transition-all duration-300">
+            <div class="space-y-4">
+                <!-- Header Title -->
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse"></i>
+                        <span>DJ • На основе воспроизведения</span>
+                    </span>
+                    <button onclick="toggleRightPanel()" class="text-zinc-500 hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Big Track Artwork Card -->
+                <div class="relative group rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800/80 aspect-square shadow-2xl">
+                    <img id="right-panel-thumb" src="https://placehold.co/400x400/18181b/a1a1aa?text=SoundTube" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Now Playing Art">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                        <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-music"></i>
+                            <span>HD Audio Output</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Track Details -->
+                <div class="flex items-center justify-between">
+                    <div class="overflow-hidden">
+                        <h3 id="right-panel-title" class="font-extrabold text-white text-xl truncate leading-tight">Выберите трек</h3>
+                        <p id="right-panel-author" class="text-xs font-semibold text-zinc-400 truncate mt-1">SoundTube Player</p>
+                    </div>
+                    <button onclick="toggleLikeCurrentTrack()" id="right-like-btn" class="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-400 transition shrink-0 ml-2">
+                        <i class="fa-plus text-base fa-solid"></i>
+                    </button>
+                </div>
+
+                <!-- Liquid Lyrics Card -->
+                <div class="lyrics-card rounded-2xl p-4 border border-emerald-500/30 flex flex-col space-y-3 relative overflow-hidden mt-4">
+                    <!-- Lyrics Top Bar -->
+                    <div class="flex items-center justify-between text-xs text-emerald-400">
+                        <div class="flex items-center space-x-2 font-bold tracking-wide">
+                            <i class="fa-solid fa-microphone-lines text-base text-emerald-400 animate-bounce"></i>
+                            <span class="text-white text-sm">Liquid Lyrics</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <button onclick="scrollLyricsUp()" class="w-7 h-7 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition border border-zinc-700/50">
+                                <i class="fa-solid fa-arrow-up text-[10px]"></i>
+                            </button>
+                            <button onclick="scrollLyricsDown()" class="w-7 h-7 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition border border-zinc-700/50">
+                                <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                            </button>
+                            <button onclick="openVisualizerModal()" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center transition border border-emerald-500/30" title="На весь экран">
+                                <i class="fa-solid fa-expand text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Glowing Dots Indicator -->
+                    <div class="flex justify-center space-x-1.5 py-1">
+                        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <div class="w-2 h-2 rounded-full bg-emerald-400/60"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+                    </div>
+
+                    <!-- Dynamic Scrolling Text Container -->
+                    <div id="lyrics-content-container" class="space-y-3 text-center text-xs font-medium text-zinc-400 max-h-48 overflow-y-auto px-2 py-2 cursor-grab select-none">
+                        <p class="lyrics-line transition">Never sleep, I'll never die, мои сны</p>
+                        <p class="lyrics-line transition">мороз ща</p>
+                        <p class="lyrics-line-active text-emerald-300 font-bold my-2 text-sm transition">Серебро в руках, мне его не оторвать ща</p>
+                        <p class="lyrics-line transition">Иду высоко, не хочу просыпаться</p>
+                        <p class="lyrics-line transition">Вокруг много людей, мы знакомы</p>
+                        <p class="lyrics-line transition">Звуки волн в колонках Xbox visualizer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-[10px] text-zinc-500 text-center mt-4">
+                SoundTube Lyrics Engine • 2026
+            </div>
+        </aside>
     </div>
 
     <!-- BOTTOM MUSIC PLAYER BAR -->
@@ -429,12 +527,12 @@
 
         // Visualizer State
         let audioCtx, analyser, dataArray;
-        let vizPreset = 'neon-ribbon'; // 'neon-ribbon', 'cyber-rings', 'liquid-waves'
+        let vizPreset = 'liquid-waves'; // Set fixed liquid wave visualization by default
         let vizAnimationFrame = null;
 
         // Realistic Fallback/Mock Songs for fallback when API reaches quota limits
         const mockTracks = [
-            { id: "jfKfPfyJRdk", title: "Lofi Hip Hop Radio - Beats to Relax/Study to", channel: "Lofi Girl", duration: "3:45", thumbnail: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400" },
+            { id: "jfKfPfyJRdk", title: "XS - ONDA ANDAR (Liquid Version)", channel: "ONDA ANDAR", duration: "3:45", thumbnail: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400" },
             { id: "5qap5aO4i9A", title: "Lofi Hip Hop - Chill Beats", channel: "ChillHop", duration: "4:12", thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" },
             { id: "2spya3S584Y", title: "Phonk Mix 2024 - Drift & Bass", channel: "Phonk Nation", duration: "2:50", thumbnail: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400" },
             { id: "MVPTGNGiI-4", title: "Synthwave Cyberpunk 80s Retrowave", channel: "Retro Vibes", duration: "5:10", thumbnail: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400" },
@@ -478,6 +576,69 @@
             window.addEventListener('resize', resizeCanvas);
         });
 
+        // Toggle Right Panel Visibility
+        function toggleRightPanel() {
+            const panel = document.getElementById('right-now-playing-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        // --- Playback Controls ---
+        function playTrackDirect(track) {
+            currentQueue = [track];
+            currentIndex = 0;
+            loadTrack(track);
+        }
+
+        function loadTrack(track) {
+            // Bottom Bar Updates
+            document.getElementById('player-thumb').src = track.thumbnail;
+            document.getElementById('player-title').textContent = track.title;
+            document.getElementById('player-author').textContent = track.channel;
+
+            // Right Panel Updates
+            document.getElementById('right-panel-thumb').src = track.thumbnail;
+            document.getElementById('right-panel-title').textContent = track.title;
+            document.getElementById('right-panel-author').textContent = track.channel;
+
+            // Visualizer Modal Updates
+            document.getElementById('viz-thumb').src = track.thumbnail;
+            document.getElementById('viz-info-title').textContent = track.title;
+            document.getElementById('viz-info-author').textContent = track.channel;
+            document.getElementById('viz-track-title').textContent = `${track.title} • ${track.channel}`;
+
+            checkIfLiked(track.id);
+            updateLiquidLyrics(track.title);
+
+            if (ytPlayer && playerReady) {
+                ytPlayer.loadVideoById(track.id);
+                isPlaying = true;
+                updatePlayPauseUI();
+            }
+        }
+
+        // Generate dynamic mock lyrics based on track title
+        function updateLiquidLyrics(title) {
+            const container = document.getElementById('lyrics-content-container');
+            container.innerHTML = `
+                <p class="lyrics-line transition">Never sleep, I'll never die, мои сны</p>
+                <p class="lyrics-line transition">мороз ща</p>
+                <p class="lyrics-line-active text-emerald-300 font-bold my-2 text-sm transition">Серебро в руках, мне его не оторвать ща</p>
+                <p class="lyrics-line transition">Иду высоко, не хочу просыпаться</p>
+                <p class="lyrics-line transition">Вокруг много людей, мы знакомы</p>
+                <p class="lyrics-line transition">Волна ${title}</p>
+            `;
+        }
+
+        function scrollLyricsUp() {
+            const container = document.getElementById('lyrics-content-container');
+            container.scrollTop -= 35;
+        }
+
+        function scrollLyricsDown() {
+            const container = document.getElementById('lyrics-content-container');
+            container.scrollTop += 35;
+        }
+
         // --- YouTube API Player setup ---
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player', {
@@ -497,7 +658,6 @@
         }
 
         function onPlayerStateChange(event) {
-            // YT.PlayerState.PLAYING = 1, PAUSED = 2, ENDED = 0
             if (event.data === YT.PlayerState.PLAYING) {
                 isPlaying = true;
                 updatePlayPauseUI();
@@ -520,7 +680,7 @@
         async function searchQuery(query) {
             if (!query.trim()) return;
             switchTab('search');
-            document.getElementById('search-results-title').textContent = `Поиск: "${query}"`;
+            document.getElementById('search-results-title').textContent = `Результаты поиска: "${query}"`;
             document.getElementById('main-search-input').value = query;
 
             try {
@@ -573,32 +733,6 @@
                 `;
                 container.appendChild(card);
             });
-        }
-
-        // --- Playback Controls ---
-        function playTrackDirect(track) {
-            currentQueue = [track];
-            currentIndex = 0;
-            loadTrack(track);
-        }
-
-        function loadTrack(track) {
-            document.getElementById('player-thumb').src = track.thumbnail;
-            document.getElementById('player-title').textContent = track.title;
-            document.getElementById('player-author').textContent = track.channel;
-
-            document.getElementById('viz-thumb').src = track.thumbnail;
-            document.getElementById('viz-info-title').textContent = track.title;
-            document.getElementById('viz-info-author').textContent = track.channel;
-            document.getElementById('viz-track-title').textContent = `${track.title} • ${track.channel}`;
-
-            checkIfLiked(track.id);
-
-            if (ytPlayer && playerReady) {
-                ytPlayer.loadVideoById(track.id);
-                isPlaying = true;
-                updatePlayPauseUI();
-            }
         }
 
         function togglePlayPause() {
@@ -688,10 +822,14 @@
         function checkIfLiked(id) {
             const liked = likedTracks.some(t => t.id === id);
             const btn = document.getElementById('like-btn');
+            const rightBtn = document.getElementById('right-like-btn');
+
             if (liked) {
                 btn.innerHTML = `<i class="fa-solid fa-heart text-emerald-400 text-base"></i>`;
+                if(rightBtn) rightBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-400 text-base"></i>`;
             } else {
                 btn.innerHTML = `<i class="fa-regular fa-heart text-base"></i>`;
+                if(rightBtn) rightBtn.innerHTML = `<i class="fa-solid fa-plus text-base"></i>`;
             }
         }
 
@@ -743,7 +881,6 @@
             const track = currentQueue[currentIndex];
             const ytUrl = `https://www.youtube.com/watch?v=${track.id}`;
             
-            // Create a temporary metadata file download simulation
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
                 title: track.title,
                 author: track.channel,
@@ -779,7 +916,7 @@
                 document.getElementById('nav-search').className = "w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium text-sm transition text-white bg-zinc-800/70";
             } else if (tab === 'library') {
                 document.getElementById('tab-library').classList.remove('hidden');
-                document.getElementById('nav-library').className = "w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium text-sm transition text-white bg-zinc-800/70";
+                document.getElementById('nav-library').className = "w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium text-white bg-zinc-800/70";
                 renderLibrary();
             }
         }
@@ -801,14 +938,14 @@
             }
         }
 
-        // --- XBOX 360 VISUALIZER ENGINE (Web Audio API + HTML5 Canvas) ---
+        // --- ENHANCED XBOX 360 VISUALIZER ENGINE (Web Audio API + HTML5 Canvas) ---
         function initWebAudio() {
             if (audioCtx) return;
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 128;
+                analyser.fftSize = 256;
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
             } catch (e) {
                 console.warn('Web Audio Context initialize failed:', e);
@@ -852,19 +989,19 @@
 
             function draw() {
                 vizAnimationFrame = requestAnimationFrame(draw);
-                vizTime += 0.02;
+                vizTime += 0.03;
 
                 if (analyser && dataArray) {
                     analyser.getByteFrequencyData(dataArray);
                 } else {
-                    // Simulated frequency data for realistic look if audio node isn't attached
-                    dataArray = new Uint8Array(64);
-                    for (let i = 0; i < 64; i++) {
-                        dataArray[i] = Math.floor(Math.sin(vizTime * 2 + i * 0.1) * 60 + 120);
+                    // Smooth continuous audio fallback
+                    dataArray = new Uint8Array(128);
+                    for (let i = 0; i < 128; i++) {
+                        dataArray[i] = Math.floor(Math.sin(vizTime * 3 + i * 0.15) * 80 + 130);
                     }
                 }
 
-                ctx.fillStyle = 'rgba(5, 10, 8, 0.25)';
+                ctx.fillStyle = 'rgba(5, 8, 7, 0.25)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 const width = canvas.width;
@@ -872,24 +1009,47 @@
                 const centerX = width / 2;
                 const centerY = height / 2;
 
-                // Average volume / bass push calculation
-                let avg = 0;
-                for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
-                avg = avg / dataArray.length;
-                const bass = dataArray[2] || 120;
+                let bass = dataArray[2] || 120;
 
-                if (vizPreset === 'neon-ribbon') {
+                if (vizPreset === 'liquid-waves') {
+                    // --- REFIXED LIQUID WAVES VISUALIZER ---
+                    ctx.save();
+                    const waveLayers = 4;
+                    for (let w = 0; w < waveLayers; w++) {
+                        ctx.beginPath();
+                        const hue = (145 + w * 20 + bass * 0.1) % 360;
+                        ctx.fillStyle = `hsla(${hue}, 95%, 45%, ${0.25 + w * 0.15})`;
+                        ctx.strokeStyle = `hsla(${hue}, 100%, 65%, 0.8)`;
+                        ctx.lineWidth = 3;
+
+                        ctx.moveTo(0, height);
+                        for (let x = 0; x <= width; x += 10) {
+                            const sampleIdx = Math.floor((x / width) * (dataArray.length / 2));
+                            const amp = (dataArray[sampleIdx] || 100) * 0.6;
+                            const y = height * 0.65 +
+                                Math.sin(x * 0.008 + vizTime * (1 + w * 0.3) + w) * (amp + 30) +
+                                Math.cos(x * 0.004 - vizTime * 0.5) * 25;
+                            ctx.lineTo(x, y);
+                        }
+                        ctx.lineTo(width, height);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+
+                } else if (vizPreset === 'neon-ribbon') {
                     // --- Xbox 360 Swirling Neon Ribbons ---
                     ctx.save();
-                    ctx.lineWidth = 3;
-                    ctx.shadowBlur = 15;
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 18;
                     ctx.shadowColor = '#10b981';
 
                     const ribbonCount = 5;
                     for (let r = 0; r < ribbonCount; r++) {
                         ctx.beginPath();
                         const colorHue = (140 + r * 15 + bass * 0.2) % 360;
-                        ctx.strokeStyle = `hsla(${colorHue}, 100%, 50%, 0.8)`;
+                        ctx.strokeStyle = `hsla(${colorHue}, 100%, 50%, 0.85)`;
 
                         for (let x = 0; x < width; x += 15) {
                             const freqIdx = Math.floor((x / width) * dataArray.length);
@@ -906,7 +1066,7 @@
 
                     // Pulsing XBOX 360 Neon Core Spheres
                     ctx.beginPath();
-                    const coreRadius = 40 + (bass / 255) * 50;
+                    const coreRadius = 45 + (bass / 255) * 50;
                     const grad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, coreRadius);
                     grad.addColorStop(0, 'rgba(16, 185, 129, 0.9)');
                     grad.addColorStop(0.5, 'rgba(5, 150, 105, 0.4)');
@@ -922,7 +1082,7 @@
                     const ringCount = 8;
                     for (let i = 0; i < ringCount; i++) {
                         const freq = dataArray[i * 4] || 100;
-                        const radius = (i + 1) * 35 + (freq * 0.4);
+                        const radius = (i + 1) * 38 + (freq * 0.4);
 
                         ctx.beginPath();
                         ctx.lineWidth = 2 + (freq / 80);
@@ -942,26 +1102,6 @@
                         }
                         ctx.closePath();
                         ctx.stroke();
-                    }
-                    ctx.restore();
-
-                } else if (vizPreset === 'liquid-waves') {
-                    // --- Fluid Liquid Light Spectrum ---
-                    ctx.save();
-                    const barWidth = (width / dataArray.length) * 1.5;
-                    for (let i = 0; i < dataArray.length; i++) {
-                        const barHeight = (dataArray[i] / 255) * (height * 0.4);
-                        const x = i * barWidth * 1.2;
-
-                        const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
-                        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.1)');
-                        gradient.addColorStop(0.5, 'rgba(5, 150, 105, 0.8)');
-                        gradient.addColorStop(1, 'rgba(110, 231, 183, 1)');
-
-                        ctx.fillStyle = gradient;
-                        ctx.shadowBlur = 10;
-                        ctx.shadowColor = '#10b981';
-                        ctx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
                     }
                     ctx.restore();
                 }
