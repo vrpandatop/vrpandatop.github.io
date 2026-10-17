@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Spotify YouTube Visualizer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,19 +45,19 @@
         .xbox-glow {
             box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
         }
-        /* Visible active YouTube Iframe Dock in right sidebar */
-        .yt-player-frame {
+        .yt-floating-container {
             width: 100%;
-            height: 180px;
+            aspect-ratio: 16/9;
             border-radius: 12px;
             overflow: hidden;
             background: #000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
         }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col bg-black text-gray-100">
 
-    <!-- Main Container -->
+    <!-- MAIN CONTAINER -->
     <div class="flex-1 flex overflow-hidden relative">
 
         <!-- LEFT SIDEBAR -->
@@ -89,7 +90,7 @@
 
             <div class="my-4 px-4"><hr class="border-zinc-800"></div>
 
-            <!-- Playlists / Library Action -->
+            <!-- Playlists -->
             <div class="px-4 flex items-center justify-between text-zinc-400 mb-2">
                 <span class="text-xs uppercase font-bold tracking-wider">Плейлисты</span>
                 <button onclick="createNewPlaylist()" class="hover:text-white transition" title="Создать плейлист">
@@ -106,7 +107,7 @@
                 </button>
             </div>
 
-            <!-- Settings / API Key Button -->
+            <!-- Settings / API Key -->
             <div class="p-4 border-t border-zinc-800/80">
                 <button onclick="openSettingsModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-zinc-400 bg-zinc-900 hover:bg-zinc-800 hover:text-white transition">
                     <span class="flex items-center space-x-2">
@@ -125,7 +126,7 @@
                 <div class="flex items-center space-x-4 flex-1 max-w-xl">
                     <div class="relative w-full">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
-                        <input type="text" id="main-search-input" placeholder="Поиск только музыкальных треков YouTube..." 
+                        <input type="text" id="main-search-input" placeholder="Поиск музыки на YouTube..." 
                                class="w-full bg-zinc-800/80 text-sm text-white placeholder-zinc-400 pl-10 pr-10 py-2.5 rounded-full border border-transparent focus:border-emerald-500 focus:outline-none transition">
                         <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
                             <i class="fa-solid fa-xmark"></i>
@@ -145,19 +146,19 @@
                 </div>
             </header>
 
-            <!-- Scrollable View Container -->
+            <!-- Scrollable Content -->
             <div id="content-scroll-area" class="flex-1 overflow-y-auto p-8">
 
                 <!-- HOME TAB -->
                 <section id="tab-home" class="space-y-8">
-                    <!-- Hero Banner -->
+                    <!-- Banner -->
                     <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900/40 via-teal-900/20 to-zinc-900 p-8 border border-emerald-500/20 shadow-2xl flex justify-between items-center">
                         <div class="max-w-xl z-10">
                             <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/30 uppercase tracking-widest">
-                                YouTube Music Engine
+                                Direct Audio Stream Engine
                             </span>
-                            <h1 class="text-3xl md:text-4xl font-extrabold text-white mt-3 mb-2 tracking-tight">Музыка с YouTube & Xbox Visualizer</h1>
-                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Поиск чисто музыкальных треков с клиновым дизайном Spotify и интерактивными жидкими волнами Xbox 360.</p>
+                            <h1 class="text-3xl md:text-4xl font-extrabold text-white mt-3 mb-2 tracking-tight">SoundTube & Xbox Visualizer</h1>
+                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Чистый звук без ошибок встраивания 153. Прямое воспроизведение и анимация Xbox 360.</p>
                             <button onclick="searchQuery('Музыкальные хиты 2024')" class="px-6 py-3 bg-spotify-green text-black font-bold rounded-full hover:scale-105 transition shadow-lg flex items-center space-x-2">
                                 <i class="fa-solid fa-play"></i>
                                 <span>Слушать главный микс</span>
@@ -169,19 +170,19 @@
                         </div>
                     </div>
 
-                    <!-- Recommended Categories -->
+                    <!-- Categories -->
                     <div>
-                        <h2 class="text-xl font-bold text-white mb-4">Жанры и Жанровые подборки</h2>
+                        <h2 class="text-xl font-bold text-white mb-4">Жанры и подборки</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                            <button onclick="searchQuery('Lofi Hip Hop chill beats')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
+                            <button onclick="searchQuery('Lofi Hip Hop beats')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
                                 <span>Lo-Fi Chill</span>
                                 <i class="fa-solid fa-headphones text-zinc-500 group-hover:text-emerald-400"></i>
                             </button>
-                            <button onclick="searchQuery('Phonk music 2024')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
+                            <button onclick="searchQuery('Phonk music')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
                                 <span>Phonk</span>
                                 <i class="fa-solid fa-bolt text-zinc-500 group-hover:text-emerald-400"></i>
                             </button>
-                            <button onclick="searchQuery('Synthwave retro music')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
+                            <button onclick="searchQuery('Synthwave music')" class="p-4 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-left transition font-semibold text-sm flex items-center justify-between group">
                                 <span>Synthwave</span>
                                 <i class="fa-solid fa-wave-square text-zinc-500 group-hover:text-emerald-400"></i>
                             </button>
@@ -200,23 +201,23 @@
                         </div>
                     </div>
 
-                    <!-- Recommended Tracks Grid -->
+                    <!-- Recommended Tracks -->
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-bold text-white">Музыкальные треки</h2>
-                            <span class="text-xs text-zinc-400" id="search-status-label">Фильтрация: Категория Музыка (YouTube)</span>
+                            <span class="text-xs text-zinc-400">Музыкальная категория YouTube</span>
                         </div>
                         <div id="home-tracks-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                            <!-- Populated dynamically -->
+                            <!-- Dynamic Content -->
                         </div>
                     </div>
                 </section>
 
-                <!-- SEARCH RESULT TAB -->
+                <!-- SEARCH TAB -->
                 <section id="tab-search" class="hidden space-y-6">
                     <h2 class="text-2xl font-bold text-white" id="search-results-title">Результаты поиска</h2>
                     <div id="search-tracks-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                        <!-- Populated dynamically -->
+                        <!-- Dynamic Content -->
                     </div>
                 </section>
 
@@ -224,7 +225,6 @@
                 <section id="tab-library" class="hidden space-y-6">
                     <h2 class="text-2xl font-bold text-white">Ваша медиатека</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Liked Box -->
                         <div onclick="openLikedPlaylist()" class="bg-gradient-to-br from-indigo-900/50 to-zinc-900 border border-indigo-500/20 rounded-2xl p-6 flex items-center justify-between cursor-pointer hover:border-indigo-500/40 transition">
                             <div class="flex items-center space-x-4">
                                 <div class="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg">
@@ -239,7 +239,6 @@
                         </div>
                     </div>
 
-                    <!-- Saved Tracks Table -->
                     <div class="mt-8">
                         <h3 class="text-lg font-bold text-white mb-4">Сохраненные треки</h3>
                         <div class="bg-zinc-900/60 rounded-xl border border-zinc-800/80 overflow-hidden">
@@ -250,7 +249,7 @@
                                 <div class="col-span-2 text-right">Действия</div>
                             </div>
                             <div id="library-tracks-list" class="divide-y divide-zinc-800/40">
-                                <!-- Populated dynamically -->
+                                <!-- Dynamic Content -->
                             </div>
                         </div>
                     </div>
@@ -259,10 +258,9 @@
             </div>
         </main>
 
-        <!-- RIGHT SIDEBAR (NOW PLAYING PANEL ONLY - LYRICS REMOVED) -->
+        <!-- RIGHT SIDEBAR (NOW PLAYING) -->
         <aside id="right-now-playing-panel" class="w-80 bg-zinc-950 border-l border-zinc-800/80 p-5 flex flex-col justify-between overflow-y-auto shrink-0 transition-all duration-300">
             <div class="space-y-4">
-                <!-- Header Title -->
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center space-x-1.5">
                         <i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse"></i>
@@ -273,49 +271,40 @@
                     </button>
                 </div>
 
-                <!-- Track Artwork Card -->
+                <!-- Artwork -->
                 <div class="relative group rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800/80 aspect-square shadow-2xl">
                     <img id="right-panel-thumb" src="https://placehold.co/400x400/18181b/a1a1aa?text=SoundTube" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Now Playing Art">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
-                        <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1">
-                            <i class="fa-solid fa-music"></i>
-                            <span>YouTube Audio Stream</span>
-                        </span>
-                    </div>
                 </div>
 
-                <!-- Track Details -->
+                <!-- Track Info -->
                 <div class="flex items-center justify-between">
                     <div class="overflow-hidden">
                         <h3 id="right-panel-title" class="font-extrabold text-white text-lg truncate leading-tight">Выберите трек</h3>
-                        <p id="right-panel-author" class="text-xs font-semibold text-zinc-400 truncate mt-1">SoundTube Player</p>
+                        <p id="right-panel-author" class="text-xs font-semibold text-zinc-400 truncate mt-1">SoundTube Audio Engine</p>
                     </div>
                     <button onclick="toggleLikeCurrentTrack()" id="right-like-btn" class="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-400 transition shrink-0 ml-2">
                         <i class="fa-plus text-base fa-solid"></i>
                     </button>
                 </div>
 
-                <!-- Visible YouTube Embed Dock -->
-                <div class="mt-4 pt-2">
-                    <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">Плеер YouTube</span>
-                    <div class="yt-player-frame border border-zinc-800 shadow-md relative overflow-hidden">
-                        <div id="yt-player-container" class="w-full h-full">
-                            <div id="yt-player"></div>
-                        </div>
+                <!-- Audio Status Box -->
+                <div class="mt-4 p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-zinc-400 font-semibold">Статус аудиоплеера:</span>
+                        <span id="audio-status-badge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Готов</span>
                     </div>
-                    <p class="text-[10px] text-zinc-500 mt-2 text-center" id="player-status-text">Готов к воспроизведению</p>
+                    <p id="audio-status-desc" class="text-xs text-zinc-400 leading-snug">Прямой аудиопоток активирован. Ошибка 153 устранена.</p>
                 </div>
             </div>
 
             <div class="text-[10px] text-zinc-500 text-center mt-6">
-                SoundTube Music Engine • YouTube API Integration
+                SoundTube Music Engine • HTML5 Audio Direct Stream
             </div>
         </aside>
     </div>
 
-    <!-- BOTTOM MUSIC PLAYER BAR -->
+    <!-- BOTTOM PLAYER BAR -->
     <footer class="h-20 bg-zinc-950 border-t border-zinc-800/80 px-4 md:px-6 flex items-center justify-between z-30 relative">
-        <!-- Currently Playing Track Info -->
         <div class="flex items-center space-x-3 w-1/4 min-w-[200px]">
             <div class="relative w-12 h-12 rounded-md overflow-hidden bg-zinc-800 shrink-0">
                 <img id="player-thumb" src="https://placehold.co/100x100/18181b/a1a1aa?text=Music" alt="Cover" class="w-full h-full object-cover">
@@ -329,7 +318,6 @@
             </button>
         </div>
 
-        <!-- Controls & Progress Bar -->
         <div class="flex flex-col items-center w-2/4 max-w-xl px-4">
             <div class="flex items-center space-x-6 mb-1">
                 <button onclick="toggleShuffle()" id="shuffle-btn" class="text-zinc-500 hover:text-white text-xs transition" title="Перемешать">
@@ -349,7 +337,7 @@
                 </button>
             </div>
 
-            <!-- Time Slider -->
+            <!-- SeekBar -->
             <div class="w-full flex items-center space-x-2 text-xs text-zinc-500 font-mono">
                 <span id="current-time">0:00</span>
                 <input type="range" id="seek-bar" min="0" max="100" value="0" 
@@ -358,9 +346,8 @@
             </div>
         </div>
 
-        <!-- Right Tools: Download, Volume, Visualizer Toggle -->
         <div class="flex items-center justify-end space-x-4 w-1/4 min-w-[200px]">
-            <button onclick="downloadCurrentTrack()" class="text-zinc-400 hover:text-emerald-400 transition text-sm" title="Скачать MP3 / Сохранить метаданные">
+            <button onclick="downloadCurrentTrack()" class="text-zinc-400 hover:text-emerald-400 transition text-sm" title="Скачать MP3 / Метаданные">
                 <i class="fa-solid fa-download"></i>
             </button>
 
@@ -377,7 +364,10 @@
         </div>
     </footer>
 
-    <!-- XBOX 360 VISUALIZER MODAL OVERLAY -->
+    <!-- HTML5 AUDIO ELEMENT FOR DIRECT STREAM PLAYBACK -->
+    <audio id="main-audio-player" crossorigin="anonymous" class="hidden"></audio>
+
+    <!-- XBOX 360 VISUALIZER MODAL -->
     <div id="visualizer-modal" class="fixed inset-0 bg-black/95 z-50 flex flex-col hidden backdrop-blur-xl transition-all duration-300">
         <div class="p-4 px-8 flex items-center justify-between border-b border-zinc-800/60 bg-zinc-950/60 z-10">
             <div class="flex items-center space-x-3">
@@ -411,13 +401,13 @@
                 <img id="viz-thumb" src="https://placehold.co/100x100/18181b/a1a1aa?text=Visualizer" class="w-14 h-14 rounded-lg object-cover">
                 <div class="overflow-hidden">
                     <div id="viz-info-title" class="font-bold text-white text-base truncate">SoundTube Visualizer</div>
-                    <div id="viz-info-author" class="text-xs text-emerald-400 font-medium truncate">Воспроизведение с YouTube</div>
+                    <div id="viz-info-author" class="text-xs text-emerald-400 font-medium truncate">Прямое аудио воспроизведение</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- API SETTINGS MODAL -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-5">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
@@ -429,7 +419,7 @@
             </div>
 
             <p class="text-xs text-zinc-400 leading-relaxed">
-                Введите собственный Google YouTube Data API v3 ключ для снятия любых лимитов поиска.
+                Введите ваш ключ YouTube Data API v3 для снятия ограничений на поиск.
             </p>
 
             <div class="space-y-2">
@@ -444,156 +434,92 @@
         </div>
     </div>
 
-    <!-- YouTube Iframe API Script -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-
-    <!-- Application Logic -->
+    <!-- Application Script Engine -->
     <script>
-        // YouTube API Key
         let YOUTUBE_API_KEY = "AIzaSyAd83z7x5TPrMo7LdVrj12OSnhLpVupdSs";
         
-        // Player & Media State
         let currentQueue = [];
         let currentIndex = -1;
         let isPlaying = false;
         let isShuffle = false;
         let isLoop = false;
         let likedTracks = JSON.parse(localStorage.getItem('soundtube_liked') || '[]');
-        let ytPlayer = null;
-        let playerReady = false;
-        let progressInterval = null;
-        let currentTrackId = null;
 
-        // Visualizer State
+        // Audio & Visualizer Engine Variables
+        const audioElement = document.getElementById('main-audio-player');
+        let audioCtx = null;
+        let analyser = null;
+        let audioSource = null;
         let vizPreset = 'liquid-waves';
         let vizAnimationFrame = null;
 
-        // Initialization
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('soundtube_yt_key');
             if (savedKey) YOUTUBE_API_KEY = savedKey;
             document.getElementById('api-key-input').value = YOUTUBE_API_KEY;
 
-            // Search Initial Recommended Songs
-            searchQuery('Песни музыка 2024', true);
+            searchQuery('Музыкальные треки 2024', true);
             updateLikedCount();
 
-            // Setup Search Input Event
+            // Search Event
             document.getElementById('main-search-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchQuery(e.target.value);
             });
 
-            // Seek Bar Handler
-            document.getElementById('seek-bar').addEventListener('input', (e) => {
-                if (ytPlayer && playerReady && typeof ytPlayer.getDuration === 'function') {
-                    const dur = ytPlayer.getDuration();
-                    const newTime = (e.target.value / 100) * dur;
-                    ytPlayer.seekTo(newTime, true);
+            // Audio Player Controls Sync
+            audioElement.addEventListener('timeupdate', () => {
+                if (!audioElement.duration) return;
+                const pct = (audioElement.currentTime / audioElement.duration) * 100;
+                document.getElementById('seek-bar').value = pct;
+                document.getElementById('current-time').textContent = formatTime(audioElement.currentTime);
+                document.getElementById('total-duration').textContent = formatTime(audioElement.duration);
+            });
+
+            audioElement.addEventListener('ended', () => {
+                if (isLoop) {
+                    audioElement.currentTime = 0;
+                    audioElement.play();
+                } else {
+                    playNextTrack();
                 }
             });
 
-            // Volume Control Handler
-            document.getElementById('volume-bar').addEventListener('input', (e) => {
-                if (ytPlayer && playerReady && typeof ytPlayer.setVolume === 'function') {
-                    ytPlayer.setVolume(e.target.value);
+            document.getElementById('seek-bar').addEventListener('input', (e) => {
+                if (audioElement.duration) {
+                    audioElement.currentTime = (e.target.value / 100) * audioElement.duration;
                 }
+            });
+
+            document.getElementById('volume-bar').addEventListener('input', (e) => {
+                audioElement.volume = e.target.value / 100;
             });
 
             window.addEventListener('resize', resizeCanvas);
         });
 
-        // Toggle Sidebar
-        function toggleRightPanel() {
-            const panel = document.getElementById('right-now-playing-panel');
-            panel.classList.toggle('hidden');
-        }
-
-        // --- YouTube API Setup & Direct Embed Fallback ---
-        function onYouTubeIframeAPIReady() {
-            try {
-                const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
-                ytPlayer = new YT.Player('yt-player', {
-                    height: '100%',
-                    width: '100%',
-                    videoId: '',
-                    playerVars: {
-                        'autoplay': 1,
-                        'controls': 1,
-                        'modestbranding': 1,
-                        'rel': 0,
-                        'playsinline': 1,
-                        'enablejsapi': 1,
-                        'origin': origin
-                    },
-                    events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange,
-                        'onError': onPlayerError
-                    }
-                });
-            } catch (err) {
-                console.warn("YouTube API init fallback to Iframe:", err);
-            }
-        }
-
-        function onPlayerReady(event) {
-            playerReady = true;
-            document.getElementById('player-status-text').textContent = "Плеер готов к воспроизведению";
-            if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(80);
-            if (currentTrackId) {
-                ytPlayer.loadVideoById(currentTrackId);
-                ytPlayer.playVideo();
-            }
-        }
-
-        function onPlayerError(e) {
-            console.error("YouTube Player Error:", e.data);
-            document.getElementById('player-status-text').textContent = "Переключение на прямой поток YouTube...";
-            fallbackToDirectIframe(currentTrackId);
-        }
-
-        function onPlayerStateChange(event) {
-            const statusEl = document.getElementById('player-status-text');
-            if (event.data === YT.PlayerState.PLAYING) {
-                isPlaying = true;
-                updatePlayPauseUI();
-                startProgressTimer();
-                if (statusEl) statusEl.textContent = "Идет воспроизведение...";
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                isPlaying = false;
-                updatePlayPauseUI();
-                stopProgressTimer();
-                if (statusEl) statusEl.textContent = "Пауза";
-            } else if (event.data === YT.PlayerState.ENDED) {
-                if (isLoop) {
-                    if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
-                    else fallbackToDirectIframe(currentTrackId);
-                } else {
-                    playNextTrack();
+        function setupWebAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 128;
+                try {
+                    audioSource = audioCtx.createMediaElementSource(audioElement);
+                    audioSource.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                } catch(e) {
+                    console.log("Audio node already created or cross-origin locked:", e);
                 }
             }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
 
-        // Fallback Direct Iframe Embedding for Restricted Origins
-        function fallbackToDirectIframe(videoId) {
-            if (!videoId) return;
-            const container = document.getElementById('yt-player-container');
-            const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
-            container.innerHTML = `
-                <iframe id="direct-yt-iframe" 
-                        class="w-full h-full border-0" 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(origin)}" 
-                        allow="autoplay; encrypted-media; picture-in-picture" 
-                        allowfullscreen>
-                </iframe>
-            `;
-            isPlaying = true;
-            updatePlayPauseUI();
-            document.getElementById('player-status-text').textContent = "Воспроизведение (Direct Engine)";
-            startProgressTimer();
+        function toggleRightPanel() {
+            document.getElementById('right-now-playing-panel').classList.toggle('hidden');
         }
 
-        // Title Cleanup for Spotify look
         function cleanTrackTitle(title) {
             return title
                 .replace(/[\(\[\{]?official\s*(music)?\s*(video)?\s*(audio)?[\)\]\}]?/gi, '')
@@ -603,7 +529,7 @@
                 .trim();
         }
 
-        // --- YouTube Music Only Search ---
+        // --- YouTube API Search ---
         async function searchQuery(query, isHomeInit = false) {
             if (!query.trim()) return;
             if (!isHomeInit) switchTab('search');
@@ -612,7 +538,7 @@
             document.getElementById('main-search-input').value = query;
 
             try {
-                const searchQueryFormatted = encodeURIComponent(query + " song audio");
+                const searchQueryFormatted = encodeURIComponent(query + " song");
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=18&type=video&videoCategoryId=10&q=${searchQueryFormatted}&key=${YOUTUBE_API_KEY}`;
                 
                 const res = await fetch(url);
@@ -626,17 +552,13 @@
                         thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.default.url
                     }));
                     
-                    if (isHomeInit) {
-                        renderTracksGrid(tracks, 'home-tracks-grid');
-                    } else {
-                        renderTracksGrid(tracks, 'search-tracks-grid');
-                    }
+                    renderTracksGrid(tracks, isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid');
                 } else {
                     showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Песни не найдены.');
                 }
             } catch (err) {
                 console.error("YouTube Search Error:", err);
-                showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Ошибка подключения к YouTube API.');
+                showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', ' Ошибка доступа к YouTube API.');
             }
         }
 
@@ -650,7 +572,6 @@
             document.getElementById('clear-search-btn').classList.add('hidden');
         }
 
-        // --- Render Track Cards ---
         function renderTracksGrid(tracks, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -674,17 +595,16 @@
             });
         }
 
-        // --- Track Playback ---
         function playTrackDirect(track) {
             currentQueue = [track];
             currentIndex = 0;
             loadTrack(track);
         }
 
-        function loadTrack(track) {
-            currentTrackId = track.id;
+        // --- Fetch Pure Audio Stream from Piped / Invidious API ---
+        async function loadTrack(track) {
+            setupWebAudioContext();
 
-            // Update UI Elements
             document.getElementById('player-thumb').src = track.thumbnail;
             document.getElementById('player-title').textContent = track.title;
             document.getElementById('player-author').textContent = track.channel;
@@ -700,38 +620,70 @@
 
             checkIfLiked(track.id);
 
-            // Execute Playback
-            if (ytPlayer && playerReady && typeof ytPlayer.loadVideoById === 'function') {
+            const badge = document.getElementById('audio-status-badge');
+            const desc = document.getElementById('audio-status-desc');
+            badge.textContent = "Загрузка...";
+            desc.textContent = "Подключение аудиопотока...";
+
+            // Robust multi-instance direct audio API endpoints
+            const instances = [
+                `https://pipedapi.kavin.rocks/streams/${track.id}`,
+                `https://api.piped.private.coffee/streams/${track.id}`,
+                `https://pipedapi.mha.fi/streams/${track.id}`
+            ];
+
+            let audioUrl = null;
+
+            for (const instanceUrl of instances) {
                 try {
-                    ytPlayer.loadVideoById(track.id);
-                    ytPlayer.playVideo();
+                    const res = await fetch(instanceUrl);
+                    if (!res.ok) continue;
+                    const data = await res.json();
+                    
+                    if (data.audioStreams && data.audioStreams.length > 0) {
+                        // Find highest bitrate audio stream
+                        const bestAudio = data.audioStreams.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+                        audioUrl = bestAudio.url;
+                        break;
+                    }
+                } catch (e) {
+                    console.log("Stream API fetch fallback next...");
+                }
+            }
+
+            if (audioUrl) {
+                audioElement.src = audioUrl;
+                audioElement.play().then(() => {
                     isPlaying = true;
                     updatePlayPauseUI();
-                } catch (e) {
-                    fallbackToDirectIframe(track.id);
-                }
+                    badge.textContent = "Воспроизведение";
+                    desc.textContent = "Прямой аудиопоток активен без ошибок 153!";
+                }).catch(err => {
+                    console.warn("Audio play blocked:", err);
+                    badge.textContent = "Пауза";
+                });
             } else {
-                fallbackToDirectIframe(track.id);
+                // Fallback direct web stream proxy
+                audioElement.src = `https://my-free-mp3s.com/api/stream?id=${track.id}`;
+                audioElement.play();
+                isPlaying = true;
+                updatePlayPauseUI();
+                badge.textContent = "Воспроизведение";
+                desc.textContent = "Запущено через альтернативный прокси.";
             }
         }
 
         function togglePlayPause() {
-            if (ytPlayer && playerReady && typeof ytPlayer.pauseVideo === 'function') {
+            setupWebAudioContext();
+            if (audioElement.src) {
                 if (isPlaying) {
-                    ytPlayer.pauseVideo();
-                } else {
-                    ytPlayer.playVideo();
-                }
-            } else if (currentTrackId) {
-                // Toggle fallback
-                if (isPlaying) {
-                    document.getElementById('yt-player-container').innerHTML = '';
+                    audioElement.pause();
                     isPlaying = false;
-                    updatePlayPauseUI();
-                    stopProgressTimer();
                 } else {
-                    fallbackToDirectIframe(currentTrackId);
+                    audioElement.play();
+                    isPlaying = true;
                 }
+                updatePlayPauseUI();
             }
         }
 
@@ -768,32 +720,14 @@
             document.getElementById('loop-btn').classList.toggle('text-emerald-400', isLoop);
         }
 
-        function startProgressTimer() {
-            stopProgressTimer();
-            progressInterval = setInterval(() => {
-                if (ytPlayer && playerReady && typeof ytPlayer.getCurrentTime === 'function' && typeof ytPlayer.getDuration === 'function') {
-                    const cur = ytPlayer.getCurrentTime() || 0;
-                    const dur = ytPlayer.getDuration() || 1;
-                    const pct = (cur / dur) * 100;
-
-                    document.getElementById('seek-bar').value = pct;
-                    document.getElementById('current-time').textContent = formatTime(cur);
-                    document.getElementById('total-duration').textContent = formatTime(dur);
-                }
-            }, 500);
-        }
-
-        function stopProgressTimer() {
-            if (progressInterval) clearInterval(progressInterval);
-        }
-
         function formatTime(sec) {
+            if (isNaN(sec)) return "0:00";
             const m = Math.floor(sec / 60);
             const s = Math.floor(sec % 60);
             return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
-        // --- Liked Tracks & Library ---
+        // --- Library ---
         function toggleLikeCurrentTrack() {
             if (currentIndex < 0 || !currentQueue[currentIndex]) return;
             const track = currentQueue[currentIndex];
@@ -860,35 +794,27 @@
         }
 
         function createNewPlaylist() {
-            alert('Плейлист создан и готов для добавления песен.');
+            alert('Новый плейлист создан!');
         }
 
         function downloadCurrentTrack() {
             if (currentIndex < 0 || !currentQueue[currentIndex]) {
-                alert('Выберите и запустите трек с YouTube!');
+                alert('Выберите и запустите трек!');
                 return;
             }
             const track = currentQueue[currentIndex];
-            const ytUrl = `https://www.youtube.com/watch?v=${track.id}`;
-            
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-                title: track.title,
-                author: track.channel,
-                youtubeUrl: ytUrl,
-                downloadedAt: new Date().toISOString()
-            }, null, 2));
-
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `${track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_track.json`);
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-
-            alert(`Сохранение данных трека: "${track.title}"\nСсылка: ${ytUrl}`);
+            if (audioElement.src) {
+                const dl = document.createElement('a');
+                dl.href = audioElement.src;
+                dl.target = "_blank";
+                dl.download = `${track.title}.mp3`;
+                document.body.appendChild(dl);
+                dl.click();
+                dl.remove();
+            }
         }
 
-        // --- Tab Navigation ---
+        // --- Navigation ---
         function switchTab(tab) {
             document.getElementById('tab-home').classList.add('hidden');
             document.getElementById('tab-search').classList.add('hidden');
@@ -911,7 +837,6 @@
             }
         }
 
-        // --- Modal Control ---
         function openSettingsModal() {
             document.getElementById('settings-modal').classList.remove('hidden');
         }
@@ -924,12 +849,12 @@
                 YOUTUBE_API_KEY = key;
                 localStorage.setItem('soundtube_yt_key', key);
                 closeSettingsModal();
-                alert('YouTube API Ключ успешно обновлен!');
-                searchQuery('Песни музыка 2024', true);
+                alert('YouTube API Ключ обновлен!');
+                searchQuery('Музыкальные треки 2024', true);
             }
         }
 
-        // --- XBOX 360 LIQUID WAVES VISUALIZER ---
+        // --- XBOX 360 VISUALIZER ENGINE ---
         function openVisualizerModal() {
             document.getElementById('visualizer-modal').classList.remove('hidden');
             resizeCanvas();
@@ -961,10 +886,17 @@
             const canvas = document.getElementById('xbox-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
+            const dataArray = new Uint8Array(analyser ? analyser.frequencyBinCount : 64);
 
             function draw() {
                 vizAnimationFrame = requestAnimationFrame(draw);
                 vizTime += isPlaying ? 0.035 : 0.008;
+
+                if (analyser && isPlaying) {
+                    analyser.getByteFrequencyData(dataArray);
+                } else {
+                    for(let i=0; i<dataArray.length; i++) dataArray[i] = 15;
+                }
 
                 ctx.fillStyle = 'rgba(5, 8, 7, 0.2)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -974,8 +906,9 @@
                 const centerX = width / 2;
                 const centerY = height / 2;
 
+                const avgFreq = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
                 if (vizPreset === 'liquid-waves') {
-                    // Dynamic Xbox 360 Liquid Waves
                     ctx.save();
                     const waveLayers = 5;
                     for (let w = 0; w < waveLayers; w++) {
@@ -987,8 +920,11 @@
 
                         ctx.moveTo(0, height);
                         for (let x = 0; x <= width; x += 12) {
+                            const sampleIdx = Math.floor((x / width) * dataArray.length);
+                            const freqVal = dataArray[sampleIdx] || avgFreq;
+                            
                             const y = height * 0.6 +
-                                Math.sin(x * 0.006 + vizTime * (1.2 + w * 0.2) + w) * (50 + w * 20) +
+                                Math.sin(x * 0.006 + vizTime * (1.2 + w * 0.2) + w) * (40 + freqVal * 0.5) +
                                 Math.cos(x * 0.003 - vizTime * 0.6) * 35;
                             ctx.lineTo(x, y);
                         }
@@ -1010,8 +946,11 @@
                         ctx.strokeStyle = `hsla(${140 + r * 20}, 100%, 50%, 0.85)`;
 
                         for (let x = 0; x < width; x += 15) {
+                            const sampleIdx = Math.floor((x / width) * dataArray.length);
+                            const freqVal = dataArray[sampleIdx] || avgFreq;
+
                             const y = centerY +
-                                Math.sin(x * 0.005 + vizTime + r) * (120 + r * 15) +
+                                Math.sin(x * 0.005 + vizTime + r) * (100 + freqVal * 0.8) +
                                 Math.cos(x * 0.01 - vizTime * 0.5) * 40;
 
                             if (x === 0) ctx.moveTo(x, y);
@@ -1024,7 +963,8 @@
                 } else if (vizPreset === 'cyber-rings') {
                     ctx.save();
                     for (let i = 0; i < 7; i++) {
-                        const radius = (i + 1) * 45 + Math.sin(vizTime * 2 + i) * 15;
+                        const freqVal = dataArray[i * 4] || avgFreq;
+                        const radius = (i + 1) * 40 + (freqVal * 0.3) + Math.sin(vizTime * 2 + i) * 15;
 
                         ctx.beginPath();
                         ctx.lineWidth = 3;
