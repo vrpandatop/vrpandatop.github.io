@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>SoundTube - Spotify YouTube Visualizer</title>
+    <title>SoundTube</title>
+    <!-- Динамическая фавиконка (логотип вкладки) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='12' fill='%231db954'/><path d='M10 14.5V7.8a.8.8 0 0 1 1.2-.7l5.2 3.5a.8.8 0 0 1 0 1.4l-5.2 3.5a.8.8 0 0 1-1.2-.7z' fill='%23000'/></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -147,11 +149,11 @@
                     <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900/40 via-teal-900/20 to-zinc-900 p-8 border border-emerald-500/20 shadow-2xl flex justify-between items-center">
                         <div class="max-w-xl z-10">
                             <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/30 uppercase tracking-widest">
-                                Hybrid Playback Engine 2.0
+                                Direct Stream & Audio Visualizer 3.0
                             </span>
                             <h1 class="text-3xl md:text-4xl font-extrabold text-white mt-3 mb-2 tracking-tight">SoundTube & Xbox Visualizer</h1>
-                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Плавное воспроизведение треков без ошибок встраивания 153. Гибридный движок YouTube API + HTML5 Audio.</p>
-                            <button onclick="searchQuery('Музыкальные хиты 2024')" class="px-6 py-3 bg-spotify-green text-black font-bold rounded-full hover:scale-105 transition shadow-lg flex items-center space-x-2">
+                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Мощный движок прямого потока без ограничений встраивания с настоящим анализатором частот для визуализации.</p>
+                            <button onclick="searchQuery('Музыкальные хиты 2026')" class="px-6 py-3 bg-spotify-green text-black font-bold rounded-full hover:scale-105 transition shadow-lg flex items-center space-x-2">
                                 <i class="fa-solid fa-play"></i>
                                 <span>Слушать главный микс</span>
                             </button>
@@ -263,19 +265,16 @@
                     </button>
                 </div>
 
-                <!-- Hybrid Artwork / YouTube Iframe Container -->
+                <!-- Artwork Container -->
                 <div class="relative group rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800/80 aspect-square shadow-2xl">
                     <img id="right-panel-thumb" src="https://placehold.co/400x400/18181b/a1a1aa?text=SoundTube" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Now Playing Art">
-                    <div id="yt-player-container" class="absolute inset-0 hidden">
-                        <div id="yt-player-iframe"></div>
-                    </div>
                 </div>
 
                 <!-- Track Info -->
                 <div class="flex items-center justify-between">
                     <div class="overflow-hidden">
                         <h3 id="right-panel-title" class="font-extrabold text-white text-lg truncate leading-tight">Выберите трек</h3>
-                        <p id="right-panel-author" class="text-xs font-semibold text-zinc-400 truncate mt-1">SoundTube Hybrid Engine</p>
+                        <p id="right-panel-author" class="text-xs font-semibold text-zinc-400 truncate mt-1">SoundTube Stream Engine</p>
                     </div>
                     <button onclick="toggleLikeCurrentTrack()" id="right-like-btn" class="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-400 transition shrink-0 ml-2">
                         <i class="fa-plus text-base fa-solid"></i>
@@ -285,15 +284,15 @@
                 <!-- Audio Status Box -->
                 <div class="mt-4 p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-zinc-400 font-semibold">Режим аудиоплеера:</span>
+                        <span class="text-xs text-zinc-400 font-semibold">Статус потока:</span>
                         <span id="audio-status-badge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Готов</span>
                     </div>
-                    <p id="audio-status-desc" class="text-xs text-zinc-400 leading-snug">Гибридный движок активирован (YouTube API + Direct Proxy Stream).</p>
+                    <p id="audio-status-desc" class="text-xs text-zinc-400 leading-snug">Аудиопоток готов к воспроизведению с визуализацией частот.</p>
                 </div>
             </div>
 
             <div class="text-[10px] text-zinc-500 text-center mt-6">
-                SoundTube Music Engine • Hybrid Dual-Engine Playback
+                SoundTube Music Engine • Direct Stream & Visualizer
             </div>
         </aside>
     </div>
@@ -342,7 +341,7 @@
         </div>
 
         <div class="flex items-center justify-end space-x-4 w-1/4 min-w-[200px]">
-            <button onclick="downloadCurrentTrack()" class="text-zinc-400 hover:text-emerald-400 transition text-sm" title="Скачать MP3 / Метаданные">
+            <button onclick="downloadCurrentTrack()" class="text-zinc-400 hover:text-emerald-400 transition text-sm" title="Скачать MP3 / YouTube">
                 <i class="fa-solid fa-download"></i>
             </button>
 
@@ -359,7 +358,7 @@
         </div>
     </footer>
 
-    <!-- HTML5 AUDIO ELEMENT FOR DIRECT STREAM PLAYBACK -->
+    <!-- HTML5 AUDIO ELEMENT FOR REAL SPECTRUM ANALYSIS -->
     <audio id="main-audio-player" crossorigin="anonymous" class="hidden"></audio>
 
     <!-- XBOX 360 VISUALIZER MODAL -->
@@ -396,7 +395,7 @@
                 <img id="viz-thumb" src="https://placehold.co/100x100/18181b/a1a1aa?text=Visualizer" class="w-14 h-14 rounded-lg object-cover">
                 <div class="overflow-hidden">
                     <div id="viz-info-title" class="font-bold text-white text-base truncate">SoundTube Visualizer</div>
-                    <div id="viz-info-author" class="text-xs text-emerald-400 font-medium truncate">Прямое аудио воспроизведение</div>
+                    <div id="viz-info-author" class="text-xs text-emerald-400 font-medium truncate">Реальный анализ частот (Beat reactive)</div>
                 </div>
             </div>
         </div>
@@ -414,7 +413,7 @@
             </div>
 
             <p class="text-xs text-zinc-400 leading-relaxed">
-                Введите ваш ключ YouTube Data API v3 для снятия ограничений на поиск.
+                Введите ваш ключ YouTube Data API v3 для поиска треков. Если квота исчерпана, поиск автоматически переключится на резервный поиск.
             </p>
 
             <div class="space-y-2">
@@ -429,9 +428,6 @@
         </div>
     </div>
 
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-
     <!-- Application Script Engine -->
     <script>
         let YOUTUBE_API_KEY = "AIzaSyAd83z7x5TPrMo7LdVrj12OSnhLpVupdSs";
@@ -443,11 +439,6 @@
         let isLoop = false;
         let likedTracks = JSON.parse(localStorage.getItem('soundtube_liked') || '[]');
 
-        // Playback Engine state: 'yt' (YouTube IFrame) or 'audio' (HTML5 Audio Direct)
-        let activeEngine = 'yt';
-        let ytPlayer = null;
-        let ytReady = false;
-
         // Audio & Visualizer Engine Variables
         const audioElement = document.getElementById('main-audio-player');
         let audioCtx = null;
@@ -456,62 +447,12 @@
         let vizPreset = 'liquid-waves';
         let vizAnimationFrame = null;
 
-        // YouTube Iframe API Callback
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('yt-player-iframe', {
-                height: '100%',
-                width: '100%',
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 0,
-                    'disablekb': 1,
-                    'fs': 0,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'playsinline': 1,
-                    'origin': window.location.origin
-                },
-                events: {
-                    'onReady': () => { ytReady = true; },
-                    'onStateChange': onYTPlayerStateChange,
-                    'onError': onYTPlayerError
-                }
-            });
-        }
-
-        function onYTPlayerStateChange(event) {
-            if (activeEngine !== 'yt') return;
-            if (event.data === YT.PlayerState.PLAYING) {
-                isPlaying = true;
-                updatePlayPauseUI();
-                updateStatusBadge('Воспроизведение (YouTube API)', 'Официальный плеер YouTube активен.');
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                isPlaying = false;
-                updatePlayPauseUI();
-                updateStatusBadge('Пауза', 'Воспроизведение приостановлено.');
-            } else if (event.data === YT.PlayerState.ENDED) {
-                if (isLoop) {
-                    ytPlayer.seekTo(0);
-                    ytPlayer.playVideo();
-                } else {
-                    playNextTrack();
-                }
-            }
-        }
-
-        function onYTPlayerError(event) {
-            console.warn("YouTube Player error:", event.data, "- Switching to HTML5 Direct Stream Fallback...");
-            if (currentQueue[currentIndex]) {
-                fallbackToAudioStream(currentQueue[currentIndex]);
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('soundtube_yt_key');
             if (savedKey) YOUTUBE_API_KEY = savedKey;
             document.getElementById('api-key-input').value = YOUTUBE_API_KEY;
 
-            searchQuery('Музыкальные треки 2024', true);
+            searchQuery('Музыкальные треки 2026', true);
             updateLikedCount();
 
             // Search Event
@@ -519,74 +460,53 @@
                 if (e.key === 'Enter') searchQuery(e.target.value);
             });
 
-            // Universal 250ms Timer Polling to sync seek-bar & duration across both engines
-            setInterval(syncPlaybackProgress, 250);
+            // Sync seek bar & progress timer
+            audioElement.addEventListener('timeupdate', () => {
+                if (audioElement.duration) {
+                    const pct = (audioElement.currentTime / audioElement.duration) * 100;
+                    document.getElementById('seek-bar').value = pct;
+                    document.getElementById('current-time').textContent = formatTime(audioElement.currentTime);
+                    document.getElementById('total-duration').textContent = formatTime(audioElement.duration);
+                }
+            });
 
-            // Audio Player Events
             audioElement.addEventListener('ended', () => {
-                if (activeEngine === 'audio') {
-                    if (isLoop) {
-                        audioElement.currentTime = 0;
-                        audioElement.play();
-                    } else {
-                        playNextTrack();
-                    }
+                if (isLoop) {
+                    audioElement.currentTime = 0;
+                    audioElement.play();
+                } else {
+                    playNextTrack();
                 }
             });
 
             document.getElementById('seek-bar').addEventListener('input', (e) => {
-                const targetPct = e.target.value / 100;
-                if (activeEngine === 'yt' && ytPlayer && ytReady && ytPlayer.getDuration) {
-                    const dur = ytPlayer.getDuration();
-                    if (dur) ytPlayer.seekTo(dur * targetPct, true);
-                } else if (activeEngine === 'audio' && audioElement.duration) {
+                if (audioElement.duration) {
+                    const targetPct = e.target.value / 100;
                     audioElement.currentTime = targetPct * audioElement.duration;
                 }
             });
 
             document.getElementById('volume-bar').addEventListener('input', (e) => {
-                const vol = e.target.value;
-                audioElement.volume = vol / 100;
-                if (ytPlayer && ytReady && ytPlayer.setVolume) {
-                    ytPlayer.setVolume(vol);
-                }
+                audioElement.volume = e.target.value / 100;
             });
 
             window.addEventListener('resize', resizeCanvas);
         });
 
-        function syncPlaybackProgress() {
-            let currTime = 0;
-            let totalDur = 0;
-
-            if (activeEngine === 'yt' && ytPlayer && ytReady && typeof ytPlayer.getCurrentTime === 'function') {
-                currTime = ytPlayer.getCurrentTime() || 0;
-                totalDur = ytPlayer.getDuration() || 0;
-            } else if (activeEngine === 'audio' && audioElement.duration) {
-                currTime = audioElement.currentTime || 0;
-                totalDur = audioElement.duration || 0;
-            }
-
-            if (totalDur > 0) {
-                const pct = (currTime / totalDur) * 100;
-                document.getElementById('seek-bar').value = pct;
-                document.getElementById('current-time').textContent = formatTime(currTime);
-                document.getElementById('total-duration').textContent = formatTime(totalDur);
-            }
-        }
-
-        function setupWebAudioContext() {
+        // Initialize Web Audio Context for Real Spectrum Analysis
+        function initAudioContext() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 128;
+                analyser.fftSize = 256; // Количество частотных столбцов для высокой детализации битов
+                
                 try {
                     audioSource = audioCtx.createMediaElementSource(audioElement);
                     audioSource.connect(analyser);
                     analyser.connect(audioCtx.destination);
                 } catch(e) {
-                    console.log("Audio node already created or cross-origin locked:", e);
+                    console.log("Audio node connection info:", e);
                 }
             }
             if (audioCtx.state === 'suspended') {
@@ -607,7 +527,7 @@
                 .trim();
         }
 
-        // --- Pure YouTube Music API Search ---
+        // --- YouTube & Fallback Search Engine ---
         async function searchQuery(query, isHomeInit = false) {
             if (!query.trim()) return;
             if (!isHomeInit) switchTab('search');
@@ -616,29 +536,59 @@
             document.getElementById('main-search-input').value = query;
 
             try {
-                const searchQueryFormatted = encodeURIComponent(query + " music track");
-                // Pure Youtube search strictly filtered for music (videoCategoryId=10)
-                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=18&type=video&videoCategoryId=10&q=${searchQueryFormatted}&key=${YOUTUBE_API_KEY}`;
-                
+                const searchQueryFormatted = encodeURIComponent(query + " audio track");
+                let tracks = [];
+
+                // Попытка запроса через Официальный YouTube API v3
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&type=video&videoCategoryId=10&q=${searchQueryFormatted}&key=${YOUTUBE_API_KEY}`;
                 const res = await fetch(url);
                 const data = await res.json();
 
                 if (data.items && data.items.length > 0) {
-                    const tracks = data.items.map(item => ({
+                    tracks = data.items.map(item => ({
                         id: item.id.videoId,
                         title: cleanTrackTitle(item.snippet.title),
                         channel: item.snippet.channelTitle.replace('- Topic', '').trim(),
                         thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.default.url
                     }));
-                    
+                } else if (data.error) {
+                    console.warn("YouTube API квота исчерпана или ключ недействителен. Запуск резервного поиска...");
+                    tracks = await fallbackSearch(query);
+                }
+
+                if (tracks.length > 0) {
                     renderTracksGrid(tracks, isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid');
                 } else {
                     showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Песни не найдены.');
                 }
             } catch (err) {
-                console.error("YouTube Search Error:", err);
-                showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Ошибка доступа к YouTube API.');
+                console.warn("Ошибка API, переходим на резервный поиск:", err);
+                const fallbackTracks = await fallbackSearch(query);
+                if (fallbackTracks.length > 0) {
+                    renderTracksGrid(fallbackTracks, isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid');
+                } else {
+                    showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Ошибка загрузки треков. Проверьте сеть.');
+                }
             }
+        }
+
+        // Резервный поиск без ключа API (через публичный Invidious/Piped API)
+        async function fallbackSearch(query) {
+            try {
+                const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=music_songs`);
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    return data.items.filter(item => item.type === 'stream').map(item => ({
+                        id: item.url.replace('/watch?v=', ''),
+                        title: cleanTrackTitle(item.title),
+                        channel: item.uploaderName || 'YouTube Artist',
+                        thumbnail: item.thumbnail
+                    }));
+                }
+            } catch (e) {
+                console.error("Fallback search failed:", e);
+            }
+            return [];
         }
 
         function showSearchError(containerId, message) {
@@ -702,42 +652,16 @@
             document.getElementById('audio-status-desc').textContent = descText;
         }
 
-        // --- Hybrid Track Loader ---
+        // --- Stream Audio Engine (Direct Playback with Visualizer support) ---
         async function loadTrack(track) {
-            setupWebAudioContext();
+            initAudioContext();
             updateUIWithTrack(track);
-
-            // First attempt: YouTube API embedded iframe
-            if (ytPlayer && ytReady) {
-                activeEngine = 'yt';
-                audioElement.pause();
-                document.getElementById('yt-player-container').classList.remove('hidden');
-
-                ytPlayer.loadVideoById(track.id);
-                ytPlayer.playVideo();
-                isPlaying = true;
-                updatePlayPauseUI();
-                updateStatusBadge('Загрузка YouTube', 'Запуск плеера YouTube...');
-            } else {
-                fallbackToAudioStream(track);
-            }
-        }
-
-        // Fallback Engine: Fetch Audio Stream from fallback proxies
-        async function fallbackToAudioStream(track) {
-            activeEngine = 'audio';
-            document.getElementById('yt-player-container').classList.add('hidden');
-            if (ytPlayer && ytReady && typeof ytPlayer.stopVideo === 'function') {
-                ytPlayer.stopVideo();
-            }
-
-            updateStatusBadge('Загрузка Потока...', 'Подключение резервного аудиопотока...');
+            updateStatusBadge('Загрузка потока...', 'Получение прямого аудиопотока...');
 
             const instances = [
                 `https://pipedapi.kavin.rocks/streams/${track.id}`,
                 `https://api.piped.private.coffee/streams/${track.id}`,
-                `https://pipedapi.mha.fi/streams/${track.id}`,
-                `https://invidious.drgns.space/api/v1/videos/${track.id}`
+                `https://pipedapi.mha.fi/streams/${track.id}`
             ];
 
             let audioUrl = null;
@@ -754,7 +678,7 @@
                         break;
                     }
                 } catch (e) {
-                    console.log("Stream API fetch fallback next...");
+                    console.log("Instance attempt failed, trying next...");
                 }
             }
 
@@ -763,37 +687,39 @@
                 audioElement.play().then(() => {
                     isPlaying = true;
                     updatePlayPauseUI();
-                    updateStatusBadge('Воспроизведение (Proxy Stream)', 'Прямой аудиопоток успешно подключен!');
+                    updateStatusBadge('Воспроизведение', 'Поток активен, визуализатор готов!');
                 }).catch(err => {
-                    console.warn("Audio play error:", err);
-                    isPlaying = false;
-                    updatePlayPauseUI();
+                    console.warn("Play error:", err);
+                    tryInvidiousStream(track);
                 });
             } else {
-                audioElement.src = `https://my-free-mp3s.com/api/stream?id=${track.id}`;
-                audioElement.play().then(() => {
-                    isPlaying = true;
-                    updatePlayPauseUI();
-                    updateStatusBadge('Воспроизведение (MP3 Stream)', 'Альтернативный прокси активирован.');
-                }).catch(() => {
-                    updateStatusBadge('Ошибка', 'Не удалось запустить трек. Попробуйте другой.');
-                });
+                tryInvidiousStream(track);
             }
         }
 
-        function togglePlayPause() {
-            setupWebAudioContext();
-            if (activeEngine === 'yt' && ytPlayer && ytReady) {
-                const state = ytPlayer.getPlayerState();
-                if (state === YT.PlayerState.PLAYING) {
-                    ytPlayer.pauseVideo();
-                    isPlaying = false;
-                } else {
-                    ytPlayer.playVideo();
-                    isPlaying = true;
+        async function tryInvidiousStream(track) {
+            try {
+                const res = await fetch(`https://invidious.drgns.space/api/v1/videos/${track.id}`);
+                const data = await res.json();
+                if (data.adaptiveFormats) {
+                    const audioFormat = data.adaptiveFormats.find(f => f.type && f.type.includes('audio'));
+                    if (audioFormat && audioFormat.url) {
+                        audioElement.src = audioFormat.url;
+                        audioElement.play();
+                        isPlaying = true;
+                        updatePlayPauseUI();
+                        updateStatusBadge('Воспроизведение (Invidious)', 'Аудиопоток успешно запущен.');
+                        return;
+                    }
                 }
-                updatePlayPauseUI();
-            } else if (activeEngine === 'audio' && audioElement.src) {
+            } catch(e) {}
+            
+            updateStatusBadge('Ошибка потока', 'Не удалось загрузить аудио. Попробуйте другой трек.');
+        }
+
+        function togglePlayPause() {
+            initAudioContext();
+            if (audioElement.src) {
                 if (isPlaying) {
                     audioElement.pause();
                     isPlaying = false;
@@ -965,11 +891,11 @@
                 localStorage.setItem('soundtube_yt_key', key);
                 closeSettingsModal();
                 alert('YouTube API Ключ обновлен!');
-                searchQuery('Музыкальные треки 2024', true);
+                searchQuery('Музыкальные треки 2026', true);
             }
         }
 
-        // --- XBOX 360 VISUALIZER ENGINE ---
+        // --- XBOX 360 VISUALIZER ENGINE (Beat & Frequency Reactive) ---
         function openVisualizerModal() {
             document.getElementById('visualizer-modal').classList.remove('hidden');
             resizeCanvas();
@@ -1001,21 +927,23 @@
             const canvas = document.getElementById('xbox-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            const dataArray = new Uint8Array(analyser ? analyser.frequencyBinCount : 64);
+            const dataArray = new Uint8Array(128);
 
             function draw() {
                 vizAnimationFrame = requestAnimationFrame(draw);
-                vizTime += isPlaying ? 0.035 : 0.008;
+                vizTime += isPlaying ? 0.04 : 0.01;
 
-                if (analyser && isPlaying && activeEngine === 'audio') {
+                // Считываем реальные частоты звука (биты, басы, вокал)
+                if (analyser && isPlaying && !audioElement.paused) {
                     analyser.getByteFrequencyData(dataArray);
                 } else {
                     for(let i=0; i<dataArray.length; i++) {
-                        dataArray[i] = isPlaying ? Math.floor(40 + Math.sin(vizTime*3 + i)*25) : 15;
+                        dataArray[i] = 10;
                     }
                 }
 
-                ctx.fillStyle = 'rgba(5, 8, 7, 0.2)';
+                // Шлейф движения для мягкого свечения
+                ctx.fillStyle = 'rgba(5, 8, 7, 0.25)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 const width = canvas.width;
@@ -1030,19 +958,19 @@
                     const waveLayers = 5;
                     for (let w = 0; w < waveLayers; w++) {
                         ctx.beginPath();
-                        const hue = (140 + w * 18 + Math.sin(vizTime) * 15) % 360;
-                        ctx.fillStyle = `hsla(${hue}, 90%, 45%, ${0.15 + w * 0.1})`;
+                        const hue = (140 + w * 15 + avgFreq * 0.5) % 360;
+                        ctx.fillStyle = `hsla(${hue}, 90%, 45%, ${0.12 + w * 0.08})`;
                         ctx.strokeStyle = `hsla(${hue}, 100%, 65%, 0.8)`;
                         ctx.lineWidth = 2.5;
 
                         ctx.moveTo(0, height);
-                        for (let x = 0; x <= width; x += 12) {
+                        for (let x = 0; x <= width; x += 10) {
                             const sampleIdx = Math.floor((x / width) * dataArray.length);
-                            const freqVal = dataArray[sampleIdx] || avgFreq;
+                            const freqVal = dataArray[sampleIdx] || 0;
                             
-                            const y = height * 0.6 +
-                                Math.sin(x * 0.006 + vizTime * (1.2 + w * 0.2) + w) * (40 + freqVal * 0.5) +
-                                Math.cos(x * 0.003 - vizTime * 0.6) * 35;
+                            const y = height * 0.65 +
+                                Math.sin(x * 0.005 + vizTime * (1 + w * 0.3) + w) * (20 + freqVal * 0.9) +
+                                Math.cos(x * 0.002 - vizTime * 0.5) * 25;
                             ctx.lineTo(x, y);
                         }
                         ctx.lineTo(width, height);
@@ -1055,20 +983,20 @@
                 } else if (vizPreset === 'neon-ribbon') {
                     ctx.save();
                     ctx.lineWidth = 4;
-                    ctx.shadowBlur = 18;
+                    ctx.shadowBlur = 20;
                     ctx.shadowColor = '#10b981';
 
                     for (let r = 0; r < 4; r++) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `hsla(${140 + r * 20}, 100%, 50%, 0.85)`;
+                        ctx.strokeStyle = `hsla(${140 + r * 22}, 100%, 55%, 0.85)`;
 
-                        for (let x = 0; x < width; x += 15) {
+                        for (let x = 0; x < width; x += 12) {
                             const sampleIdx = Math.floor((x / width) * dataArray.length);
-                            const freqVal = dataArray[sampleIdx] || avgFreq;
+                            const freqVal = dataArray[sampleIdx] || 0;
 
                             const y = centerY +
-                                Math.sin(x * 0.005 + vizTime + r) * (100 + freqVal * 0.8) +
-                                Math.cos(x * 0.01 - vizTime * 0.5) * 40;
+                                Math.sin(x * 0.006 + vizTime * 1.2 + r) * (40 + freqVal * 1.2) +
+                                Math.cos(x * 0.008 - vizTime * 0.4) * 30;
 
                             if (x === 0) ctx.moveTo(x, y);
                             else ctx.lineTo(x, y);
@@ -1079,20 +1007,20 @@
 
                 } else if (vizPreset === 'cyber-rings') {
                     ctx.save();
-                    for (let i = 0; i < 7; i++) {
-                        const freqVal = dataArray[i * 4] || avgFreq;
-                        const radius = (i + 1) * 40 + (freqVal * 0.3) + Math.sin(vizTime * 2 + i) * 15;
+                    for (let i = 0; i < 6; i++) {
+                        const freqVal = dataArray[i * 6] || avgFreq;
+                        const radius = (i + 1) * 35 + (freqVal * 0.6) + Math.sin(vizTime * 1.5 + i) * 10;
 
                         ctx.beginPath();
                         ctx.lineWidth = 3;
-                        ctx.strokeStyle = `hsla(${130 + i * 20}, 100%, 60%, 0.7)`;
-                        ctx.shadowBlur = 12;
+                        ctx.strokeStyle = `hsla(${130 + i * 25}, 100%, 60%, 0.8)`;
+                        ctx.shadowBlur = 15;
                         ctx.shadowColor = '#10b981';
 
-                        const segments = 32;
+                        const segments = 36;
                         for (let s = 0; s <= segments; s++) {
-                            const angle = (s / segments) * Math.PI * 2 + vizTime;
-                            const offset = Math.sin(angle * 5 + vizTime * 2) * 12;
+                            const angle = (s / segments) * Math.PI * 2 + (vizTime * (i % 2 === 0 ? 1 : -1));
+                            const offset = (dataArray[s % dataArray.length] * 0.15);
                             const rx = centerX + Math.cos(angle) * (radius + offset);
                             const ry = centerY + Math.sin(angle) * (radius + offset);
 
