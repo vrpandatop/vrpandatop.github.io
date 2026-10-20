@@ -149,10 +149,10 @@
                     <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900/40 via-teal-900/20 to-zinc-900 p-8 border border-emerald-500/20 shadow-2xl flex justify-between items-center">
                         <div class="max-w-xl z-10">
                             <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/30 uppercase tracking-widest">
-                                Direct Stream & Audio Visualizer 3.0
+                                Multi-Proxy Failover Engine 3.1
                             </span>
                             <h1 class="text-3xl md:text-4xl font-extrabold text-white mt-3 mb-2 tracking-tight">SoundTube & Xbox Visualizer</h1>
-                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Мощный движок прямого потока без ограничений встраивания с настоящим анализатором частот для визуализации.</p>
+                            <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Безотказный гибридный плеер с автопереключением зеркал и настоящим спектральным анализатором битов.</p>
                             <button onclick="searchQuery('Музыкальные хиты 2026')" class="px-6 py-3 bg-spotify-green text-black font-bold rounded-full hover:scale-105 transition shadow-lg flex items-center space-x-2">
                                 <i class="fa-solid fa-play"></i>
                                 <span>Слушать главный микс</span>
@@ -499,7 +499,7 @@
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256; // Количество частотных столбцов для высокой детализации битов
+                analyser.fftSize = 256;
                 
                 try {
                     audioSource = audioCtx.createMediaElementSource(audioElement);
@@ -527,7 +527,7 @@
                 .trim();
         }
 
-        // --- YouTube & Fallback Search Engine ---
+        // --- Search Engine ---
         async function searchQuery(query, isHomeInit = false) {
             if (!query.trim()) return;
             if (!isHomeInit) switchTab('search');
@@ -539,7 +539,6 @@
                 const searchQueryFormatted = encodeURIComponent(query + " audio track");
                 let tracks = [];
 
-                // Попытка запроса через Официальный YouTube API v3
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&type=video&videoCategoryId=10&q=${searchQueryFormatted}&key=${YOUTUBE_API_KEY}`;
                 const res = await fetch(url);
                 const data = await res.json();
@@ -551,8 +550,7 @@
                         channel: item.snippet.channelTitle.replace('- Topic', '').trim(),
                         thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.default.url
                     }));
-                } else if (data.error) {
-                    console.warn("YouTube API квота исчерпана или ключ недействителен. Запуск резервного поиска...");
+                } else {
                     tracks = await fallbackSearch(query);
                 }
 
@@ -562,7 +560,6 @@
                     showSearchError(isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid', 'Песни не найдены.');
                 }
             } catch (err) {
-                console.warn("Ошибка API, переходим на резервный поиск:", err);
                 const fallbackTracks = await fallbackSearch(query);
                 if (fallbackTracks.length > 0) {
                     renderTracksGrid(fallbackTracks, isHomeInit ? 'home-tracks-grid' : 'search-tracks-grid');
@@ -572,7 +569,6 @@
             }
         }
 
-        // Резервный поиск без ключа API (через публичный Invidious/Piped API)
         async function fallbackSearch(query) {
             try {
                 const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=music_songs`);
@@ -585,9 +581,7 @@
                         thumbnail: item.thumbnail
                     }));
                 }
-            } catch (e) {
-                console.error("Fallback search failed:", e);
-            }
+            } catch (e) {}
             return [];
         }
 
@@ -652,15 +646,18 @@
             document.getElementById('audio-status-desc').textContent = descText;
         }
 
-        // --- Stream Audio Engine (Direct Playback with Visualizer support) ---
+        // --- Multi-Proxy Failover Stream Engine ---
         async function loadTrack(track) {
             initAudioContext();
             updateUIWithTrack(track);
-            updateStatusBadge('Загрузка потока...', 'Получение прямого аудиопотока...');
+            updateStatusBadge('Подключение...', 'Поиск стабильного аудиопотока...');
 
+            // Пул резервных зеркал (если одно упало, автоматически проверяются остальные)
             const instances = [
                 `https://pipedapi.kavin.rocks/streams/${track.id}`,
                 `https://api.piped.private.coffee/streams/${track.id}`,
+                `https://pipedapi.drgns.space/streams/${track.id}`,
+                `https://api.piped.yt/streams/${track.id}`,
                 `https://pipedapi.mha.fi/streams/${track.id}`
             ];
 
@@ -674,11 +671,13 @@
                     
                     if (data.audioStreams && data.audioStreams.length > 0) {
                         const bestAudio = data.audioStreams.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
-                        audioUrl = bestAudio.url;
-                        break;
+                        if (bestAudio && bestAudio.url) {
+                            audioUrl = bestAudio.url;
+                            break;
+                        }
                     }
                 } catch (e) {
-                    console.log("Instance attempt failed, trying next...");
+                    continue; // Пробуем следующее зеркало
                 }
             }
 
@@ -687,9 +686,8 @@
                 audioElement.play().then(() => {
                     isPlaying = true;
                     updatePlayPauseUI();
-                    updateStatusBadge('Воспроизведение', 'Поток активен, визуализатор готов!');
+                    updateStatusBadge('Воспроизведение', 'Поток стабилен, визуализатор активен.');
                 }).catch(err => {
-                    console.warn("Play error:", err);
                     tryInvidiousStream(track);
                 });
             } else {
@@ -698,23 +696,34 @@
         }
 
         async function tryInvidiousStream(track) {
-            try {
-                const res = await fetch(`https://invidious.drgns.space/api/v1/videos/${track.id}`);
-                const data = await res.json();
-                if (data.adaptiveFormats) {
-                    const audioFormat = data.adaptiveFormats.find(f => f.type && f.type.includes('audio'));
-                    if (audioFormat && audioFormat.url) {
-                        audioElement.src = audioFormat.url;
-                        audioElement.play();
-                        isPlaying = true;
-                        updatePlayPauseUI();
-                        updateStatusBadge('Воспроизведение (Invidious)', 'Аудиопоток успешно запущен.');
-                        return;
+            const invidiousInstances = [
+                `https://invidious.drgns.space/api/v1/videos/${track.id}`,
+                `https://vid.priv.au/api/v1/videos/${track.id}`,
+                `https://invidious.projectsegfau.lt/api/v1/videos/${track.id}`
+            ];
+
+            for (const invUrl of invidiousInstances) {
+                try {
+                    const res = await fetch(invUrl);
+                    if (!res.ok) continue;
+                    const data = await res.json();
+                    if (data.adaptiveFormats) {
+                        const audioFormat = data.adaptiveFormats.find(f => f.type && f.type.includes('audio'));
+                        if (audioFormat && audioFormat.url) {
+                            audioElement.src = audioFormat.url;
+                            audioElement.play();
+                            isPlaying = true;
+                            updatePlayPauseUI();
+                            updateStatusBadge('Воспроизведение', 'Резервный поток запущен.');
+                            return;
+                        }
                     }
+                } catch(e) {
+                    continue;
                 }
-            } catch(e) {}
+            }
             
-            updateStatusBadge('Ошибка потока', 'Не удалось загрузить аудио. Попробуйте другой трек.');
+            updateStatusBadge('Ошибка потока', 'Не удалось запустить трек. Попробуйте другой.');
         }
 
         function togglePlayPause() {
@@ -895,7 +904,7 @@
             }
         }
 
-        // --- XBOX 360 VISUALIZER ENGINE (Beat & Frequency Reactive) ---
+        // --- XBOX 360 VISUALIZER ENGINE ---
         function openVisualizerModal() {
             document.getElementById('visualizer-modal').classList.remove('hidden');
             resizeCanvas();
@@ -933,7 +942,6 @@
                 vizAnimationFrame = requestAnimationFrame(draw);
                 vizTime += isPlaying ? 0.04 : 0.01;
 
-                // Считываем реальные частоты звука (биты, басы, вокал)
                 if (analyser && isPlaying && !audioElement.paused) {
                     analyser.getByteFrequencyData(dataArray);
                 } else {
@@ -942,7 +950,6 @@
                     }
                 }
 
-                // Шлейф движения для мягкого свечения
                 ctx.fillStyle = 'rgba(5, 8, 7, 0.25)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
